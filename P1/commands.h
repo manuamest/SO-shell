@@ -16,27 +16,34 @@
 #ifndef SOP0_COMMANDS_H
 #define SOP0_COMMANDS_H
 
-/*
-typedef struct _cmdEntry
-{
+typedef struct datos{
+    tList* list;
+    bool* finished;
+    int* cmdNumber;
+}datos;
+struct cmdEntry{
     char *name;
-    int(*function)(int argc, char *argv[]);
+    void(*function)(char *argv[], int argc, datos* data);
     char *ayuda;
-} cmdEntry;
-*/
-
-void processCmd(bool* finished, char* trozos[], tList *L, int* cmdNumber, int nTrozos);
+};
+extern struct cmdEntry cmdTable[];
+void execute(char* trozos[], int nTrozos, datos* data);
+//void processCmd(bool* finished, char* trozos[], tList *L, int* cmdNumber, int nTrozos);
 void cmdError();
-void cmdAutores(char* opcion);
-void cmdPid(char* opcion);
-void cmdCarpeta(char* opcion);
-void cmdFecha(char* opcion);
-void cmdHist(tList *L, char* opcion, int* cmdNumber);
-void cmdComando(char* opcion, bool* finished, char* trozos[], tList *L, int* cmdNumber, int nTrozos);
-void cmdInfosis();
-void cmdAyuda(char* opcion);
-void cmdStat(char* opcion);
-void cmdExit(bool* finished,const char* opcion, tList *L);
+void cmdAutores(char* opcion[], int nTrozos, datos* data);
+void cmdPid(char* opcion[], int nTrozos, datos* data);
+void cmdCarpeta(char* opcion[], int nTrozos, datos* data);
+void cmdFecha(char* opcion[], int nTrozos, datos* data);
+void cmdHist(char* opcion[], int nTrozos, datos* data);
+void cmdComando(char* opcion[], int nTrozos, datos* data);
+void cmdInfosis(char* opcion[], int nTrozos, datos* data);
+void cmdAyuda(char* opcion[], int nTrozos, datos* data);
+void cmdCreate(char* opcion[], int nTrozos, datos* data);
+void cmdStat(char* opcion[], int nTrozos, datos* data);
+void cmdList(char* opcion[], int nTrozos, datos* data);
+void cmdDelete(char* opcion[], int nTrozos, datos* data1);
+void cmdDeltree(char* opcion[], int nTrozos, datos* data);
+void cmdExit(char* opcion[], int nTrozos, datos* data);
 int TrocearCadena(char* cadena, char* trozos[]);
 
 #endif //SOP0_COMMANDS_H

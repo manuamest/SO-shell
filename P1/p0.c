@@ -27,24 +27,23 @@ void readEntry(char* line, tList *L, int* cmdNumber) {
 }
 
 int main() {
-
-    bool finished = false;
     char line[1024];
     char* trozos[128];
-    int* cmdNumber = malloc(sizeof (int));
-    *cmdNumber = 0;
-    tList L;
     int nTrozos;
+    tList L;
     createEmptyList(&L);
-    while (!finished) {
+    datos* data;
+    data->list = &L;
+    data->cmdNumber = 0;
+    data->finished = (bool *) true;
+    while (data->finished) {
         //prints a promt
         printPrompt();
-        readEntry(line, &L, cmdNumber);
+        readEntry(line, &L, data->cmdNumber);
         nTrozos = TrocearCadena(line, trozos);
         //analizar
-        processCmd(&finished, trozos, &L, cmdNumber, nTrozos);
+        execute(trozos, nTrozos, data);
     }
-    free(cmdNumber);
     clearOutList(&L);
     free(L);
 }

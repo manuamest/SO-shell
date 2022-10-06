@@ -2,8 +2,8 @@
  * Lucia Alvarez Garcia: l.alvarezg@udc.es */
 #include "commands.h"
 
-/*
-cmdEntry cmdTable[] = {
+
+struct cmdEntry cmdTable[] = {
         {"autores", cmdAutores,"uso: autores [-n|-l]\tMuestra los nombres y logins de los autores\n"},
         {"pid", cmdPid, "uso: pid [-p]\tMuestra el pid del shell o de su proceso padre\n"},
         {"carpeta", cmdCarpeta, "uso: carpeta [dir]\tCambia (o muestra) el directorio actual del shell\n"},
@@ -15,23 +15,32 @@ cmdEntry cmdTable[] = {
         {"fin", cmdExit, "uso: fin \tTermina la ejecucion del shell\n"},
         {"salir", cmdExit, "uso: salir \tTermina la ejecucion del shell\n"},
         {"bye", cmdExit, "uso: bye \tTermina la ejecucion del shell\n"},
+        {"create", cmdCreate, "uso: create [-f] [name]\tCrea un directorio o un fichero (-f)\n"},
+        {"stat", cmdStat, "uso: stat [-long][-link][-acc] name1 name2 ..\tlista ficheros;\n"
+                                                    "\t\t-long: listado largo\n\t\t-acc: acesstime\n"
+                                                    "\t\t-link: si es enlace simbolico, el path contenido\n"},
+        {"list", cmdList, "uso: list [-reca] [-recb] [-hid][-long][-link][-acc] n1 n2 ..\tlista contenidos de directorios\n"
+                                                    "\t\t-hid: incluye los ficheros ocultos\n\t\t-reca: recursivo (antes)\n"
+                                                    "\t\t-recb: recursivo (despues)\n\t\tresto parametros como stat\n"},
+        {"delete", cmdDelete, "uso: delete [name1 name2 ..]\tBorra ficheros o directorios vacios\n"},
+        {"deltree", cmdDeltree, "uso: deltree [name1 name2 ..]\tBorra ficheros o directorios no vacios recursivamente\n"},
         {NULL, NULL, NULL}
 };
 
-void execute(int nTrozos, char* trozos[]){
-    for (int i = 0; i < 9; i++) {
+void execute(char* trozos[], int nTrozos, datos* data){
+    for (int i = 0; i < 15; i++) {
         if (strcmp(trozos[0], cmdTable[i].name) == 0) {
-            cmdTable[i].function(nTrozos, &trozos[1]);
+            cmdTable[i].function(&trozos[1], nTrozos, data);
             break;
         }
     }
     cmdError();
 }
-*/
+/*
 void processCmd(bool* finished, char* trozos[], tList *L, int* cmdNumber, int nTrozos) {
     if (nTrozos != 0) {
         if (strcmp(trozos[0], "autores") == 0) {
-            cmdAutores(trozos[1]);
+            cmdAutores(trozos[1], nTrozos);
         }
         else if (strcmp(trozos[0], "pid") == 0) {
             cmdPid(trozos[1]);
@@ -66,74 +75,74 @@ void processCmd(bool* finished, char* trozos[], tList *L, int* cmdNumber, int nT
         cmdError();
     }
 }
-
+*/
 void cmdError(){
     printf("ERROR: comando invalido\n");
 }
 
-void cmdAutores(char* opcion) {
-    if (opcion==NULL) {
+void cmdAutores(char* opcion[], int nTrozos, datos* data) {
+    if (opcion[1] == NULL) {
         printf("Jose Manuel Amestoy Lopez: manuel.amestoy@udc.es\n");
         printf("Lucia Alvarez Garcia: l.alvarezg@udc.es\n");
-    }else if (strcmp(opcion, "-l") == 0) {
+    }else if (strcmp(opcion[1], "-l") == 0) {
         printf("manuel.amestoy@udc.es\nl.alvarezg@udc.es\n");
-    }else if (strcmp(opcion, "-n") == 0) {
+    }else if (strcmp(opcion[1], "-n") == 0) {
         printf("Jose Manuel Amestoy Lopez\n");
         printf("Lucia Alvarez Garcia\n");
     } else {
         cmdError();
     }
 }
-void cmdPid(char* opcion){
-    if (opcion == NULL) {
+void cmdPid(char* opcion[], int nTrozos, datos* data){
+    if (opcion[1] == NULL) {
         printf("%d\n", getpid());
-    } else if (strcmp(opcion, "-p") == 0) {
+    } else if (strcmp(opcion[1], "-p") == 0) {
         printf("%d\n", getppid());
     } else {
         cmdError();
     }
 }
 
-void cmdCarpeta(char* opcion){
+void cmdCarpeta(char* opcion[], int nTrozos, datos* data){
     const int MAX_STRING = 150;
     char string[MAX_STRING];
 
-    if(opcion == NULL)
+    if(opcion[1] == NULL)
         printf("%s\n", getcwd(string, MAX_STRING));
-    else if (chdir(opcion) == -1)
+    else if (chdir(opcion[1]) == -1)
             printf("%s\n", strerror(errno));
 }
 
-void cmdFecha(char* opcion){
+void cmdFecha(char* opcion[], int nTrozos, datos* data){
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
-    if(opcion == NULL){
+    if(opcion[1] == NULL){
         printf("%02d:%02d:%02d\n%02d-%02d-%02d\n", tm->tm_hour, tm->tm_min, tm->tm_sec, tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
     }
-    else if(strcmp(opcion, "-h") == 0){
+    else if(strcmp(opcion[1], "-h") == 0){
         printf("%02d:%02d:%02d\n", tm->tm_hour, tm->tm_min, tm->tm_sec);
     }
-    else if(strcmp(opcion, "-d") == 0){
+    else if(strcmp(opcion[1], "-d") == 0){
         printf("%02d-%02d-%02d\n", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
     }
 }
 
-void cmdHist(tList *L, char* opcion, int* cmdNumber) {
-    if (opcion == NULL) {
-        tPosL p = first(*L);
+void cmdHist (char* opcion[], int nTrozos, datos* data) {
+    if (opcion[1] == NULL) {
+        tPosL p = first(*data->list);
         while (p != LNULL) {
             printf("%d->",p->data.number);
             printf("%s", p->data.command);
             p = p->next;
         }
     }
-    else if (strcmp(opcion, "-c") == 0) {
-        clearOutList(L);
-        *cmdNumber = 0;
+    else if (strcmp(opcion[1], "-c") == 0) {
+        clearOutList(data->list);
+        *data->cmdNumber = 0;
     }
-    else if ((abs(atoi(opcion))) != -1){
-        int n = abs(atoi(opcion));
-        tPosL p = first(*L);
+    else if ((abs(atoi(opcion[1]))) != -1){
+        int n = abs(atoi(opcion[1]));
+        tPosL p = first(*data->list);
 
         for (int i = 0; i < n; ++i) {
             if (p == NULL) {
@@ -147,67 +156,57 @@ void cmdHist(tList *L, char* opcion, int* cmdNumber) {
     }
 }
 
-void cmdComando(char* opcion, bool* finished, char* trozos[], tList *L, int* cmdNumber, int nTrozos){
+void cmdComando(char* opcion[], int nTrozos, datos* data){
     if (opcion == NULL) {
-        cmdHist(L, LNULL, cmdNumber);
-    } else if (atoi(opcion) == 48) {
+        cmdHist(opcion, nTrozos, data);
+    } else if (atoi(opcion[1]) == 48) {
         tItemL d, h;
         tPosL p;
         d.number = 0;
-        p = findItem(d, *L);
-        d = getItem(p, *L);
+        p = findItem(d, *data->list);
+        d = getItem(p, *data->list);
         printf("Ejecutando hist %d: %s",d.number, h.command);
-        TrocearCadena(h.command, trozos);
-        processCmd(finished, trozos, L, cmdNumber, nTrozos);
-    } else if(atoi(opcion) > last(*L)->data.number || atoi(opcion) < 0)
-        printf("No hay elemento %s en el historico\n", opcion);
+        TrocearCadena(h.command, opcion);
+        execute(nTrozos, opcion, data);
+    } else if(atoi(opcion[1]) > last(*data->list)->data.number || atoi(opcion[1]) < 0)
+        printf("No hay elemento %s en el historico\n", opcion[1]);
     else {
         tItemL d, h;
         tPosL p;
-        d.number = abs(atoi(opcion));
-        p = findItem(d, *L);
-        h = getItem(p, *L);
+        d.number = abs(atoi(opcion[1]));
+        p = findItem(d, *data->list);
+        h = getItem(p, *data->list);
         printf("Ejecutando hist %d: %s",d.number, h.command);
-        TrocearCadena(h.command, trozos);
-        processCmd(finished, trozos, L, cmdNumber, nTrozos);
+        TrocearCadena(h.command, opcion);
+        execute(nTrozos, opcion, data);
     }
 }
 
-void cmdInfosis(){
-        struct utsname data;
-        uname(&data);
-        printf("%s (%s), OS: %s-%s-%s\n", data.nodename, data.machine, data.sysname, data.release, data.version);
+void cmdInfosis(char* opcion[], int nTrozos, datos* data){
+        struct utsname datasis;
+        uname(&datasis);
+        printf("%s (%s), OS: %s-%s-%s\n", datasis.nodename, datasis.machine, datasis.sysname, datasis.release, datasis.version);
 }
 
-void cmdAyuda(char* opcion){
-    if (opcion == NULL) {
+void cmdAyuda(char* opcion[], int nTrozos, datos* data){
+    if (opcion[1] == NULL) {
         printf("'ayuda cmd' donde cmd es uno de los siguientes comandos:\n"
                "fin salir bye fecha pid autores hist comando carpeta infosis ayuda \n");
-    }
-    else if (strcmp(opcion, "fin") == 0) { printf("fin \tTermina la ejecucion del shell\n");}
-    else if (strcmp(opcion, "salir") == 0) { printf("salir \tTermina la ejecucion del shell\n");}
-    else if (strcmp(opcion, "bye") == 0) { printf("bye \tTermina la ejecucion del shell\n");}
-    else if (strcmp(opcion, "fecha") == 0) { printf("fecha [-d|-h]\tMuestra la fecha y o la hora actual\n");}
-    else if (strcmp(opcion, "pid") == 0) { printf("pid [-p]\tMuestra el pid del shell o de su proceso padre\n");}
-    else if (strcmp(opcion, "autores") == 0) { printf("autores [-n|-l]\tMuestra los nombres y logins de los autores\n");}
-    else if (strcmp(opcion, "hist") == 0) { printf("hist [-c|-N]\tMuestra el historico de comandos, con -c lo borra\n");}
-    else if (strcmp(opcion, "comando") == 0) { printf("comando [-N]\tRepite el comando N (del historico)\n");}
-    else if (strcmp(opcion, "carpeta") == 0) { printf("carpeta [dir]\tCambia (o muestra) el directorio actual del shell\n");}
-    else if (strcmp(opcion, "infosis") == 0) { printf("infosis \tMuestra informacion de la maquina donde corre el shell\n");}
-    else if (strcmp(opcion, "ayuda") == 0) { printf("ayuda [cmd]\tMuestra ayuda sobre los comandos\n");}
-    else if (strcmp(opcion, "create") == 0) { printf("create [-f] [name]\tCrea un directorio o un fichero (-f)\n");}
-    else if (strcmp(opcion, "list") == 0) { printf("list [-reca] [-recb] [-hid][-long][-link][-acc] n1 n2 ..\tlista contenidos de directorios\n"
-                                                   "\t\t-hid: incluye los ficheros ocultos\n\t\t-reca: recursivo (antes)\n"
-                                                   "\t\t-recb: recursivo (despues)\n\t\tresto parametros como stat\n");}
-    else if (strcmp(opcion, "stat") == 0) { printf("stat [-long][-link][-acc] name1 name2 ..\tlista ficheros;\n"
-                                                   "\t\t-long: listado largo\n\t\t-acc: acesstime\n\t\t-link: si es enlace simbolico, el path contenido\n");}
-    else if (strcmp(opcion, "delete") == 0) { printf("delete [name1 name2 ..]\tBorra ficheros o directorios vacios\n");}
-    else if (strcmp(opcion, "deltree") == 0) { printf("deltree [name1 name2 ..]\tBorra ficheros o directorios no vacios recursivamente\n");}
-    else {
-        printf("%s no encontrado\n", opcion);
+    } else {
+        for (int i = 0; i < 16; i++) {
+            if (strcmp(opcion[0], cmdTable[i].name) == 0) {
+                printf("%s", cmdTable[i].ayuda);
+                break;
+            }
+        }
     }
 }
-void printfInfo(char* path, bool lomg, bool acc, bool link) {
+
+void cmdCreate(char* opcion[], int nTrozos, datos* data){
+
+}
+
+void printfInfo(char* path, bool lng, bool acc, bool link) {
     struct stat data;
     lstat(path, &data);
     time_t t = data.st_mtim.tv_sec;
@@ -215,24 +214,37 @@ void printfInfo(char* path, bool lomg, bool acc, bool link) {
     printf("%d/%d/%d-%d:%d", tm->tm_year+1970, tm->tm_mon+1, tm->tm_mday+1, tm->tm_hour, tm->tm_min);
     printf("%lu %lu %u %u %u\n",data.st_nlink, data.st_ino, data.st_uid, data.st_gid, data.st_mode);
 }
-void cmdStat(char* opcion){
+
+void cmdStat(char* opcion[], int nTrozos, datos* data){
     if (opcion == NULL) {
-        cmdCarpeta(opcion);
-    } else if (strcmp(opcion, "-long") == 0) {
+        cmdCarpeta(opcion, nTrozos, data);
+    } else if (strcmp(opcion[1], "-long") == 0) {
         printfInfo("path", true, false, false);
-    } else if (strcmp(opcion, "-acc") == 0) {
+    } else if (strcmp(opcion[1], "-acc") == 0) {
         printfInfo("path", false, true, false);
-    } else if (strcmp(opcion, "-link") == 0) {
+    } else if (strcmp(opcion[1], "-link") == 0) {
         printfInfo("path", false, false, true);
     } else {
         cmdError();
     }
 }
 
-void cmdExit(bool* finished, const char* opcion, tList *L) {
+void cmdList(char* opcion[], int nTrozos, datos* data){
+
+}
+
+void cmdDelete(char* opcion[], int nTrozos, datos* data){
+
+}
+
+void cmdDeltree(char* opcion[], int nTrozos, datos* data){
+
+}
+
+void cmdExit(char* opcion[], int nTrozos, datos* data) {
     if(opcion == NULL) {
-        clearOutList(L);
-        *finished = true;
+        clearOutList(data->list);
+        *data->finished = true;
     } else {
         cmdError();
     }
