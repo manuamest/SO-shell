@@ -199,22 +199,79 @@ int cmdCreate(char* opcion[], int nTrozos, datos* data){
 
 void printfInfo(char* path, bool lng, bool acc, bool link) {
     struct stat data;
-    lstat(path, &data);
-    time_t t = data.st_mtim.tv_sec;
-    struct tm *tm = localtime(&t);
-    printf("%d/%d/%d-%d:%d", tm->tm_year+1970, tm->tm_mon+1, tm->tm_mday+1, tm->tm_hour, tm->tm_min);
-    printf("%lu %lu %u %u %u\n",data.st_nlink, data.st_ino, data.st_uid, data.st_gid, data.st_mode);
+
+    if(lstat(path, &data) == -1)
+        printf("****error al acceder a %s: %s\n", path, strerror(errno));
+
+    else {
+        if (!lng) {
+            printf("%ld  %s\n", data.st_size, path);
+        } else {
+            if (!acc) {
+                time_t t = data.st_mtim.tv_sec;
+                struct tm *tm = localtime(&t);
+                struct passwd *pw = getpwuid(data.st_uid);
+                struct group *gr = getgrgid(data.st_gid);
+                printf("%d/%d/%d-%d:%d\t", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+                printf("%lu ( %lu)\t%s\t%s ", data.st_nlink, data.st_ino, pw->pw_name, gr->gr_name);
+            } else {
+                time_t t = data.st_atim.tv_sec;
+                struct tm *tm = localtime(&t);
+                struct passwd *pw = getpwuid(data.st_uid);
+                struct group *gr = getgrgid(data.st_gid);
+                printf("%d/%d/%d-%d:%d\t", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+                printf("%lu ( %lu)\t%s\t%s ", data.st_nlink, data.st_ino, pw->pw_name, gr->gr_name);
+            }
+
+            printf((S_ISDIR(data.st_mode)) ? "d" : "-");
+            printf((data.st_mode & S_IRUSR) ? "r" : "-");
+            printf((data.st_mode & S_IWUSR) ? "w" : "-");
+            printf((data.st_mode & S_IXUSR) ? "x" : "-");
+            printf((data.st_mode & S_IRGRP) ? "r" : "-");
+            printf((data.st_mode & S_IWGRP) ? "w" : "-");
+            printf((data.st_mode & S_IXGRP) ? "x" : "-");
+            printf((data.st_mode & S_IROTH) ? "r" : "-");
+            printf((data.st_mode & S_IWOTH) ? "w" : "-");
+            printf((data.st_mode & S_IXOTH) ? "x" : "-");
+            printf("\t");
+            printf("%ld  %s", data.st_size, path);
+
+            if(link){
+                char linkpath[150];
+                long endlink = readlink(path, linkpath, 150);
+                if(endlink != -1){
+                    linkpath[endlink] = '\0';
+                    printf(" -> %s\n", linkpath);
+                } else printf("\n");
+            } else
+                printf("\n");
+        }
+    }
 }
 
 int cmdStat(char* opcion[], int nTrozos, datos* data){
+    char string[150];
+
     if (opcion == NULL) {
-        cmdCarpeta(opcion, nTrozos, data);
-    } else if (strcmp(opcion[0], "-long") == 0) {
-        printfInfo("path", true, false, false);
-    } else if (strcmp(opcion[0], "-acc") == 0) {
-        printfInfo("path", false, true, false);
-    } else if (strcmp(opcion[0], "-link") == 0) {
-        printfInfo("path", false, false, true);
+        printf("%s\n", getcwd(string, 150));
+    }
+    else if (opcion[0] != NULL){
+        bool lng = false, acc = false, link = false;
+        int i;
+
+        for (i = 0; opcion[i+1] != NULL; i++){
+            if (strcmp(opcion[i], "-long") == 0)
+                lng = true;
+            if(strcmp(opcion[i], "-acc") == 0)
+                acc = true;
+            if(strcmp(opcion[i], "-link") == 0)
+                link = true;
+        }
+
+        if (strcmp(opcion[i], "-long") == 0 || strcmp(opcion[i], "-link") == 0 || strcmp(opcion[i], "-acc") == 0){
+            printf("%s\n", getcwd(string, 150));
+        } else
+            printfInfo(opcion[i], lng, acc, link);
     } else {
         cmdError();
     }

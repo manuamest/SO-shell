@@ -12,6 +12,7 @@
 #include <grp.h>
 #include <sys/utsname.h>
 #include <fcntl.h>
+#include <pwd.h>
 #include "list.h"
 #ifndef SOP0_COMMANDS_H
 #define SOP0_COMMANDS_H
