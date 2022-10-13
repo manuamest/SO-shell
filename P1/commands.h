@@ -22,27 +22,27 @@ typedef struct datos{
 }datos;
 struct cmdEntry{
     char *name;
-    void(*function)(char *argv[], int argc, datos* data);
+    int(*function)(char *argv[], int argc, datos* data);
     char *ayuda;
 };
 extern struct cmdEntry cmdTable[];
 int execute(char* trozos[], int nTrozos, datos* data);
 //void processCmd(bool* finished, char* trozos[], tList *L, int* cmdNumber, int nTrozos);
 void cmdError();
-void cmdAutores(char* opcion[], int nTrozos, datos* data);
-void cmdPid(char* opcion[], int nTrozos, datos* data);
-void cmdCarpeta(char* opcion[], int nTrozos, datos* data);
-void cmdFecha(char* opcion[], int nTrozos, datos* data);
-void cmdHist(char* opcion[], int nTrozos, datos* data);
-void cmdComando(char* opcion[], int nTrozos, datos* data);
-void cmdInfosis(char* opcion[], int nTrozos, datos* data);
-void cmdAyuda(char* opcion[], int nTrozos, datos* data);
-void cmdCreate(char* opcion[], int nTrozos, datos* data);
-void cmdStat(char* opcion[], int nTrozos, datos* data);
-void cmdList(char* opcion[], int nTrozos, datos* data);
-void cmdDelete(char* opcion[], int nTrozos, datos* data1);
-void cmdDeltree(char* opcion[], int nTrozos, datos* data);
-void cmdExit(char* opcion[], int nTrozos, datos* data);
+int cmdAutores(char* opcion[], int nTrozos, datos* data);
+int cmdPid(char* opcion[], int nTrozos, datos* data);
+int cmdCarpeta(char* opcion[], int nTrozos, datos* data);
+int cmdFecha(char* opcion[], int nTrozos, datos* data);
+int cmdHist(char* opcion[], int nTrozos, datos* data);
+int cmdComando(char* opcion[], int nTrozos, datos* data);
+int cmdInfosis(char* opcion[], int nTrozos, datos* data);
+int cmdAyuda(char* opcion[], int nTrozos, datos* data);
+int cmdCreate(char* opcion[], int nTrozos, datos* data);
+int cmdStat(char* opcion[], int nTrozos, datos* data);
+int cmdList(char* opcion[], int nTrozos, datos* data);
+int cmdDelete(char* opcion[], int nTrozos, datos* data1);
+int cmdDeltree(char* opcion[], int nTrozos, datos* data);
+int cmdExit(char* opcion[], int nTrozos, datos* data);
 int TrocearCadena(char* cadena, char* trozos[]);
 
 #endif //SOP0_COMMANDS_H

@@ -33,9 +33,9 @@ int main() {
     int nTrozos;
     datos* data;
     data->list = initList();
-    data->finished = true;
+    data->finished = false;
     data->cmdNumber = 0;
-    while (data->finished) {
+    while (!data->finished) {
         //prints a promt
         printPrompt();
         readEntry(line, data);
