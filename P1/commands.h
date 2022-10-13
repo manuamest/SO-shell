@@ -15,11 +15,10 @@
 #include "list.h"
 #ifndef SOP0_COMMANDS_H
 #define SOP0_COMMANDS_H
-
 typedef struct datos{
-    tList* list;
-    bool* finished;
-    int* cmdNumber;
+    tList list;
+    bool finished;
+    int cmdNumber;
 }datos;
 struct cmdEntry{
     char *name;
@@ -27,7 +26,7 @@ struct cmdEntry{
     char *ayuda;
 };
 extern struct cmdEntry cmdTable[];
-void execute(char* trozos[], int nTrozos, datos* data);
+int execute(char* trozos[], int nTrozos, datos* data);
 //void processCmd(bool* finished, char* trozos[], tList *L, int* cmdNumber, int nTrozos);
 void cmdError();
 void cmdAutores(char* opcion[], int nTrozos, datos* data);
@@ -47,4 +46,3 @@ void cmdExit(char* opcion[], int nTrozos, datos* data);
 int TrocearCadena(char* cadena, char* trozos[]);
 
 #endif //SOP0_COMMANDS_H
-

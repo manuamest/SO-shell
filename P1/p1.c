@@ -6,21 +6,22 @@
 #include <stdbool.h>
 #include "commands.h"
 
+
 void printPrompt() {
     printf("#$");
 }
 
-void toHist(tList *L, char* line, int* cmdNumber) {
+void toHist(char* line, datos* data) {
     tItemL d;
     strcpy(d.command, line);
-    d.number = *cmdNumber;
-    insertItem(d, LNULL, L);
-    (*cmdNumber)++;
+    d.number = data->cmdNumber;
+    insertItem(d, &data->list);
+    data->cmdNumber++;
 }
 
-void readEntry(char* line, tList *L, int* cmdNumber) {
+void readEntry(char* line, datos* data) {
     if(fgets(line, 1024, stdin)) {
-        toHist(L, line, cmdNumber);
+        toHist(line, data);
     } else {
         printf("ERROR: No se puede leer el input\n");
     }
@@ -30,20 +31,18 @@ int main() {
     char line[1024];
     char* trozos[128];
     int nTrozos;
-    tList L;
-    createEmptyList(&L);
     datos* data;
-    data->list = &L;
+    data->list = initList();
+    data->finished = true;
     data->cmdNumber = 0;
-    data->finished = (bool *) true;
     while (data->finished) {
         //prints a promt
         printPrompt();
-        readEntry(line, &L, data->cmdNumber);
+        readEntry(line, data);
         nTrozos = TrocearCadena(line, trozos);
         //analizar
         execute(trozos, nTrozos, data);
     }
-    clearOutList(&L);
-    free(L);
+    clearOutList(&data->list);
+    free(data->list);
 }

@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+tList initList() {
+    return LNULL;
+}
+
 bool isEmptyList(tList L) {
     return ((*L).next == LNULL);   // lista vacía si aparte del nodo cabeza no hay más nodos.
 }
@@ -22,19 +26,18 @@ bool createNode(tPosL *p) {
     return *p != LNULL;
 }
 
-bool insertItem(tItemL d, tPosL p, tList *L) {
+void insertItem(tItemL d, tList *L) {
     tPosL q, r;
-    if (!createNode(&q))        // si no queda memoria disponible devuelve false.
-        return false;
-    else {
+    if (createNode(&q)){
         q->data = d;
         q->next = LNULL;
+        if(*L == LNULL) {
+            *L = q;
+        } else {
+            for (r = *L; r->next != LNULL; r = r->next);
 
-        for (r = *L; r->next != LNULL; r = r->next);
-
-        r->next = q;        // si la hay, inserta el elemento al final de la cola.
-
-        return true;
+            r->next = q;        // si la hay, inserta el elemento al final de la cola.
+        }
     }
 }
 

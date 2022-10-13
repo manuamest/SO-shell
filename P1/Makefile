@@ -5,7 +5,7 @@ CC = gcc
 all: clean shell
 
 shell:	commands.o list.o
-	$(CC) $(CFLAGS) -o $(EXE_NAME) p0.c commands.o list.o
+	$(CC) $(CFLAGS) -o $(EXE_NAME) p1.c commands.o list.o
 
 commands.o:
 	$(CC) $(CFLAGS) -c commands.c
