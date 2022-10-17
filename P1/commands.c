@@ -197,88 +197,281 @@ int cmdCreate(char* opcion[], int nTrozos, datos* data){
     return 1;
 }
 
-void printfInfo(char* path, bool lng, bool acc, bool link) {
+void printfInfo(char* path, bool lng, bool acc, bool link, bool hid) {
     struct stat data;
+
+    char file_name[100];
+    int last_dir = 1, j = 0;
+
+    for(int i = 0; path[i] != '\0'; i++){
+        if(path[i] == '/')
+            last_dir = i;
+    }
+
+    for(int i = last_dir + 1; path[i] != '\0'; i++){
+        file_name[j] = path[i];
+        j++;
+    }
+
+    file_name[j] = '\0';
 
     if(lstat(path, &data) == -1)
         printf("****error al acceder a %s: %s\n", path, strerror(errno));
 
     else {
-        if (!lng) {
-            printf("%ld  %s\n", data.st_size, path);
-        } else {
-            if (!acc) {
-                time_t t = data.st_mtim.tv_sec;
-                struct tm *tm = localtime(&t);
-                struct passwd *pw = getpwuid(data.st_uid);
-                struct group *gr = getgrgid(data.st_gid);
-                printf("%d/%d/%d-%d:%d\t", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
-                printf("%lu ( %lu)\t%s\t%s ", data.st_nlink, data.st_ino, pw->pw_name, gr->gr_name);
+
+        if (!hid && (file_name[0] == '.' || file_name[strlen(file_name)-1] == '~') && strcmp(path, "..") != 0 && strcmp(path, ".") != 0 )
+            ;           // si es un archivo oculto / backup entonces sólo se muestra si hid = true.
+        else {
+            if (!lng) {
+                printf("%8ld  %s\n", data.st_size, file_name);
             } else {
-                time_t t = data.st_atim.tv_sec;
-                struct tm *tm = localtime(&t);
-                struct passwd *pw = getpwuid(data.st_uid);
-                struct group *gr = getgrgid(data.st_gid);
-                printf("%d/%d/%d-%d:%d\t", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
-                printf("%lu ( %lu)\t%s\t%s ", data.st_nlink, data.st_ino, pw->pw_name, gr->gr_name);
+                if (!acc) {
+                    time_t t = data.st_mtim.tv_sec;
+                    struct tm *tm = localtime(&t);
+                    struct passwd *pw = getpwuid(data.st_uid);
+                    struct group *gr = getgrgid(data.st_gid);
+                    printf("%04d/%02d/%02d-%02d:%02d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+                    printf("%4lu (%8lu) %8s %8s ", data.st_nlink, data.st_ino, pw->pw_name, gr->gr_name);
+                } else {
+                    time_t t = data.st_atim.tv_sec;
+                    struct tm *tm = localtime(&t);
+                    struct passwd *pw = getpwuid(data.st_uid);
+                    struct group *gr = getgrgid(data.st_gid);
+                    printf("%04d/%02d/%02d-%02d:%02d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+                    printf("%4lu (%8lu) %8s %8s ", data.st_nlink, data.st_ino, pw->pw_name, gr->gr_name);
+                }
+
+                printf((S_ISDIR(data.st_mode)) ? "d" : "-");
+                printf((data.st_mode & S_IRUSR) ? "r" : "-");
+                printf((data.st_mode & S_IWUSR) ? "w" : "-");
+                printf((data.st_mode & S_IXUSR) ? "x" : "-");
+                printf((data.st_mode & S_IRGRP) ? "r" : "-");
+                printf((data.st_mode & S_IWGRP) ? "w" : "-");
+                printf((data.st_mode & S_IXGRP) ? "x" : "-");
+                printf((data.st_mode & S_IROTH) ? "r" : "-");
+                printf((data.st_mode & S_IWOTH) ? "w" : "-");
+                printf((data.st_mode & S_IXOTH) ? "x" : "-");
+                printf("\t");
+                printf("%8ld  %s", data.st_size, file_name);
+
+                if(link){
+                    char linkpath[150];
+                    long endlink = readlink(path, linkpath, 150);
+                    if(endlink != -1){
+                        linkpath[endlink] = '\0';
+                        printf(" -> %s\n", linkpath);
+                    } else printf("\n");
+                } else
+                    printf("\n");
             }
-
-            printf((S_ISDIR(data.st_mode)) ? "d" : "-");
-            printf((data.st_mode & S_IRUSR) ? "r" : "-");
-            printf((data.st_mode & S_IWUSR) ? "w" : "-");
-            printf((data.st_mode & S_IXUSR) ? "x" : "-");
-            printf((data.st_mode & S_IRGRP) ? "r" : "-");
-            printf((data.st_mode & S_IWGRP) ? "w" : "-");
-            printf((data.st_mode & S_IXGRP) ? "x" : "-");
-            printf((data.st_mode & S_IROTH) ? "r" : "-");
-            printf((data.st_mode & S_IWOTH) ? "w" : "-");
-            printf((data.st_mode & S_IXOTH) ? "x" : "-");
-            printf("\t");
-            printf("%ld  %s", data.st_size, path);
-
-            if(link){
-                char linkpath[150];
-                long endlink = readlink(path, linkpath, 150);
-                if(endlink != -1){
-                    linkpath[endlink] = '\0';
-                    printf(" -> %s\n", linkpath);
-                } else printf("\n");
-            } else
-                printf("\n");
         }
+
     }
 }
 
 int cmdStat(char* opcion[], int nTrozos, datos* data){
     char string[150];
 
-    if (opcion == NULL) {
+    if (opcion[0] == NULL) {
         printf("%s\n", getcwd(string, 150));
     }
-    else if (opcion[0] != NULL){
+    else{
         bool lng = false, acc = false, link = false;
+        bool changes = true;
         int i;
 
-        for (i = 0; opcion[i+1] != NULL; i++){
-            if (strcmp(opcion[i], "-long") == 0)
+        for (i = 0; (opcion[i+1] != NULL) && (changes == true); i++){
+            changes = false;
+            if (strcmp(opcion[i], "-long") == 0){
                 lng = true;
-            if(strcmp(opcion[i], "-acc") == 0)
+                changes = true;
+            }
+            if(strcmp(opcion[i], "-acc") == 0){
                 acc = true;
-            if(strcmp(opcion[i], "-link") == 0)
+                changes = true;
+            }
+            if(strcmp(opcion[i], "-link") == 0){
                 link = true;
+                changes = true;
+            }
         }
 
-        if (strcmp(opcion[i], "-long") == 0 || strcmp(opcion[i], "-link") == 0 || strcmp(opcion[i], "-acc") == 0){
+        if (strcmp(opcion[i], "-long") == 0 || strcmp(opcion[i], "-link") == 0 || strcmp(opcion[i], "-acc") == 0){ // en caso de que se pongan las flags y no el elemento
             printf("%s\n", getcwd(string, 150));
-        } else
-            printfInfo(opcion[i], lng, acc, link);
-    } else {
-        cmdError();
+        } else {
+            if ((nTrozos == 2 && i == 0) || strcmp(opcion[i-1], "-long") == 0 || strcmp(opcion[i-1], "-link") == 0 || strcmp(opcion[i-1], "-acc") == 0)  // stat de 1 elemento sin flags
+                printfInfo(opcion[i], lng, acc, link, true);
+            else{
+                for(i = i-1; opcion[i] != NULL; ++i){   // stat de varios elementos
+                    printfInfo(opcion[i], lng, acc, link, true);
+                }
+            }
+        }
+
     }
+
     return 1;
 }
 
+void recursive(char* path, bool lng, bool acc, bool link, bool hid, bool reca, bool recb){
+    DIR *d;
+    struct dirent* itemInfo;
+
+    struct stat data;
+    lstat(path, &data);     // para el S_ISDIR()
+
+
+    if(!S_ISDIR(data.st_mode))       // si originalmente se metió un archivo en recursive() en lugar de un directorio
+        printfInfo(path, lng, acc, link, hid);
+
+    else if((d = opendir(path)) == NULL)           // si hubo fallo al abrir el directorio
+        printf("%s\n", strerror(errno));
+
+    else if (reca) {
+        char new_path[150];
+        int len;
+
+        strcpy(new_path, strcat(path, "/"));
+        path[strlen(path) - 1] = '\0';      // eliminar el "/" que se acaba de colocar en path
+        len = strlen(new_path) + 1;
+
+        printf("************%s\n", path);
+        while ((itemInfo = readdir(d)) != NULL) {
+            strcat(new_path, itemInfo->d_name);
+            printfInfo(new_path, lng, acc, link, hid);
+            new_path [len - 1] = '\0';
+        }
+
+        if((d = opendir(path)) == NULL)
+            printf("%s\n", strerror(errno));
+
+        while ((itemInfo = readdir(d)) != NULL) {
+            if ((itemInfo->d_name[0] == '.' || itemInfo->d_name[strlen(itemInfo->d_name)-1] == '~') && !hid);
+            else {
+                if(itemInfo->d_type == DT_DIR && strcmp(itemInfo->d_name, "..") != 0 && strcmp(itemInfo->d_name, ".") != 0) {  // entramos a los directorios de la carpeta introducida y mostramos sus elementos
+                    strcat(new_path, itemInfo->d_name);
+                    recursive(new_path, lng, acc, link, hid, reca, recb);
+                    new_path [len - 1] = '\0';
+                }
+            }
+        }
+
+    }
+
+    else if (recb) {
+
+        char new_path[150];
+        int len;
+
+        strcpy(new_path, strcat(path, "/"));
+        path[strlen(path) - 1] = '\0';      // eliminar el "/" que se acaba de colocar en path
+        len = strlen(new_path) + 1;
+
+        while ((itemInfo = readdir(d)) != NULL) {
+            if ((itemInfo->d_name[0] == '.' || itemInfo->d_name[strlen(itemInfo->d_name)-1] == '~') && !hid);
+            else {
+                if(itemInfo->d_type == DT_DIR && strcmp(itemInfo->d_name, "..") != 0 && strcmp(itemInfo->d_name, ".") != 0) {  // entramos a los directorios de la carpeta introducida y mostramos sus elementos
+                    strcat(new_path, itemInfo->d_name);
+                    recursive(new_path, lng, acc, link, hid, reca, recb);
+                    new_path [len - 1] = '\0';
+                }
+            }
+        }
+
+        printf("************%s\n", path);
+
+        if((d = opendir(path)) == NULL)
+            printf("%s\n", strerror(errno));
+
+        while ((itemInfo = readdir(d)) != NULL) {
+            strcat(new_path, itemInfo->d_name);
+            printfInfo(new_path, lng, acc, link, hid);
+            new_path [len - 1] = '\0';
+        }
+
+    }
+
+    else {      // si no se usa ni -reca ni -recb sólo mostramos lo del directorio dado
+
+        char new_path[150];
+        int len;
+
+        strcpy(new_path, strcat(path, "/"));
+        path[strlen(path) - 1] = '\0';      // eliminar el "/" que se acaba de colocar en path
+        len = strlen(new_path) + 1;
+
+        printf("************%s\n", path);
+
+        while ((itemInfo = readdir(d)) != NULL) {
+            strcat(new_path, itemInfo->d_name);
+            printfInfo(new_path, lng, acc, link, hid);
+            new_path [len - 1] = '\0';
+        }
+    }
+}
+
 int cmdList(char* opcion[], int nTrozos, datos* data){
+    char string[150];
+
+    if (opcion[0] == NULL) {
+        printf("%s\n", getcwd(string, 150));
+    }
+
+    else {
+        bool lng = false, acc = false, link = false, hid = false, reca = false, recb = false;
+        bool changes = true;
+        int i;
+
+        for (i = 0; (opcion[i+1] != NULL) && (changes == true); i++){
+            changes = false;
+            if (strcmp(opcion[i], "-long") == 0){
+                lng = true;
+                changes = true;
+            }
+            if(strcmp(opcion[i], "-acc") == 0){
+                acc = true;
+                changes = true;
+            }
+            if(strcmp(opcion[i], "-link") == 0){
+                link = true;
+                changes = true;
+            }
+            if(strcmp(opcion[i], "-hid") == 0){
+                hid = true;
+                changes = true;
+            }
+            if(strcmp(opcion[i], "-reca") == 0){
+                reca = true;
+                changes = true;
+            }
+            if(strcmp(opcion[i], "-recb") == 0){
+                recb = true;
+                changes = true;
+            }
+        }
+
+        if (strcmp(opcion[i], "-long") == 0 || strcmp(opcion[i], "-link") == 0 || strcmp(opcion[i], "-acc") == 0
+            || strcmp(opcion[i], "-hid") == 0 || strcmp(opcion[i], "-reca") == 0 || strcmp(opcion[i], "-recb") == 0){  // en caso de que se pongan las flags y no el elemento
+            printf("%s\n", getcwd(string, 150));
+        } else {
+            if ((nTrozos == 2 && i == 0) || strcmp(opcion[i-1], "-long") == 0 || strcmp(opcion[i-1], "-link") == 0 || strcmp(opcion[i-1], "-acc") == 0
+                || strcmp(opcion[i-1], "-hid") == 0 || strcmp(opcion[i-1], "-reca") == 0 || strcmp(opcion[i-1], "-recb") == 0) {  // en caso de que sólo se quiera hacer list de 1 elemento
+
+                recursive(opcion[i], lng, acc, link, hid, reca, recb);
+
+            }
+            else{
+                for(i = i-1; opcion[i] != NULL; ++i){                           // list de varios elementos
+                    strcpy(string, opcion[i]);
+                    recursive(string, lng, acc, link, hid, reca, recb);
+                    string[0] = '\0';
+                }
+            }
+        }
+
+    }
+
     return 1;
 }
 
