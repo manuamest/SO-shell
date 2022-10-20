@@ -1,6 +1,7 @@
 /* Jose Manuel Amestoy Lopez: manuel.amestoy@udc.es
  * Lucia Alvarez Garcia: l.alvarezg@udc.es */
 #include "commands.h"
+
 struct cmdEntry cmdTable[] = {
         {"autores", cmdAutores,"uso: autores [-n|-l]\tMuestra los nombres y logins de los autores\n"},
         {"pid", cmdPid, "uso: pid [-p]\tMuestra el pid del shell o de su proceso padre\n"},
@@ -34,6 +35,7 @@ int execute(char* trozos[], int nTrozos, datos* data){
                 return cmdTable[i].function(&trozos[1], nTrozos, data);
             }
         }
+        printf("No ejecutado: No such file or directory\n");
     }
 
     return 1;
@@ -170,6 +172,7 @@ int cmdAyuda(char* opcion[], int nTrozos, datos* data){
                 break;
             }
         }
+        printf("%s no encontrado\n", opcion[0]);
     }
     return 1;
 }
@@ -480,27 +483,65 @@ int cmdList(char* opcion[], int nTrozos, datos* data){
 int cmdDelete(char* opcion[], int nTrozos, datos* data1){
     const int MAX_STRING = 150;
     char string[MAX_STRING];
-    if (nTrozos == 0) {
+    if (opcion[0] == NULL) {
         printf("%s\n", getcwd(string, MAX_STRING));
     } else {
-        for (int i = 0; i < nTrozos ; i++) {
+        for (int i = 0; i < nTrozos-1 ; i++) {
             if (remove(opcion[i]) == -1) {
-                printf("Imposible borrar fichero: %s\n", strerror(errno));
+                printf("Imposible borrar %s: %s\n", opcion[i], strerror(errno));
             }
         }
     }
     return 1;
 }
 
+int isDirectory(const char *path) {
+    struct stat statbuf;
+    if (stat(path, &statbuf) != 0)
+        return 0;
+    return S_ISDIR(statbuf.st_mode);
+}
+
+int removeRecursivo(char* directory) {
+    DIR *d;
+    struct dirent *itemInfo;
+    char path[1024];
+
+    if((d = opendir(directory)) == NULL) return -1;
+
+    while ((itemInfo=readdir(d)) != NULL) {
+        strcpy(path, directory);
+        strcat(path, "/");
+        strcat(path, itemInfo->d_name);
+        if(strcmp(itemInfo->d_name, ".") == 0 || strcmp(itemInfo->d_name, "..") == 0) continue;
+
+        if(isDirectory(path)){
+            removeRecursivo(path);
+        }
+        if(remove(path))return -1;
+    }
+    closedir(d);
+    return 0;
+}
+
 int cmdDeltree(char* opcion[], int nTrozos, datos* data){
     const int MAX_STRING = 150;
     char string[MAX_STRING];
-    if (nTrozos == 0) {
+
+    if (opcion[0] == NULL) {
         printf("%s\n", getcwd(string, MAX_STRING));
     } else {
-        for (int i = 0; i < nTrozos ; i++) {
-            if (remove(opcion[i]) == -1) {
-                printf("Imposible borrar fichero: %s\n", strerror(errno));
+        for (int i = 0; i < nTrozos-1; i++) {
+            if (isDirectory(opcion[i])) {
+                if (rmdir(opcion[i]) == -1) {
+                    if (removeRecursivo(opcion[i]) == -1 || rmdir(opcion[i])) {
+                        printf("Imposible borrar %s: %s\n", opcion[i], strerror(errno));
+                    }
+                }
+            } else {
+                if (unlink(opcion[i]) == -1) {
+                    printf("Imposible borrar %s: %s\n", opcion[i], strerror(errno));
+                }
             }
         }
     }

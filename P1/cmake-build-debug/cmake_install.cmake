@@ -1,4 +1,4 @@
-# Install script for directory: /home/manuamest/CLionProjects/P1
+# Install script for directory: /home/manuamest/Documentos/UNI/SO/PRACTICAS/P0/VERSIONES/VERSIONES DEFINITIVAS/P1
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/manuamest/CLionProjects/P1/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/manuamest/Documentos/UNI/SO/PRACTICAS/P0/VERSIONES/VERSIONES DEFINITIVAS/P1/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
