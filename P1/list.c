@@ -4,10 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-tList initList() {
-    return LNULL;
-}
-
 bool isEmptyList(tList L) {
     return ((*L).next == LNULL);   // lista vacía si aparte del nodo cabeza no hay más nodos.
 }

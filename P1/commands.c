@@ -35,6 +35,8 @@ int execute(char* trozos[], int nTrozos, datos* data){
             }
         }
     }
+
+    return 1;
 }
 
 void cmdError(){
@@ -512,6 +514,7 @@ int cmdExit(char* opcion[], int nTrozos, datos* data) {
     } else {
         cmdError();
     }
+    return 1;
 }
 
 int TrocearCadena(char* cadena, char* trozos[]) {

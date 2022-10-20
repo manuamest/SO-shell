@@ -22,7 +22,6 @@ struct tNode {
 
 typedef tPosL tList;
 
-tList initList();
 void createEmptyList(tList *L);
 bool createNode(tPosL* p);
 void insertItem(tItemL d, tList *L);

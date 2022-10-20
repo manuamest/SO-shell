@@ -8,7 +8,7 @@
 
 
 void printPrompt() {
-    printf("#$");
+    printf("#$ ");
 }
 
 void toHist(char* line, datos* data) {
@@ -31,18 +31,18 @@ int main() {
     char line[1024];
     char* trozos[128];
     int nTrozos;
-    datos* data;
-    data->list = initList();
-    data->finished = false;
-    data->cmdNumber = 0;
-    while (!data->finished) {
+    tList lista;
+    createEmptyList(&lista);
+    datos data = { lista, true, 0 };
+
+    while (data.finished) {
         //prints a promt
         printPrompt();
-        readEntry(line, data);
+        readEntry(line, &data);
         nTrozos = TrocearCadena(line, trozos);
         //analizar
-        execute(trozos, nTrozos, data);
+        execute(trozos, nTrozos, &data);
     }
-    clearOutList(&data->list);
-    free(data->list);
+    clearOutList(&data.list);
+    free(data.list);
 }
