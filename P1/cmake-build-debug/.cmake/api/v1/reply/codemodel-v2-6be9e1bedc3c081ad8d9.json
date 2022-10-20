@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/home/manuamest/CLionProjects/PRACTICASSO/cmake-build-debug",
-		"source" : "/home/manuamest/CLionProjects/PRACTICASSO"
+		"build" : "/home/manuamest/CLionProjects/P1/cmake-build-debug",
+		"source" : "/home/manuamest/CLionProjects/P1"
 	},
 	"version" : 
 	{

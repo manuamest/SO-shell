@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/manuamest/CLionProjects/PRACTICASSO/cmake-build-debug"
+			"value" : "/home/manuamest/CLionProjects/P1/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -463,7 +463,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/manuamest/CLionProjects/PRACTICASSO"
+			"value" : "/home/manuamest/CLionProjects/P1"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -995,7 +995,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/manuamest/CLionProjects/PRACTICASSO/cmake-build-debug"
+			"value" : "/home/manuamest/CLionProjects/P1/cmake-build-debug"
 		},
 		{
 			"name" : "PRACTICASSO_IS_TOP_LEVEL",
@@ -1019,7 +1019,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/manuamest/CLionProjects/PRACTICASSO"
+			"value" : "/home/manuamest/CLionProjects/P1"
 		}
 	],
 	"kind" : "cache",

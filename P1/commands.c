@@ -478,19 +478,30 @@ int cmdList(char* opcion[], int nTrozos, datos* data){
 int cmdDelete(char* opcion[], int nTrozos, datos* data1){
     const int MAX_STRING = 150;
     char string[MAX_STRING];
-    if (opcion[0] == NULL) {
+    if (nTrozos == 0) {
         printf("%s\n", getcwd(string, MAX_STRING));
     } else {
-        if (rmdir(opcion[0]) == -1) {
-            printf("Imposible borrar carpeta: %s\n", strerror(errno));
-        }
-        if (unlink(opcion[0]) == -1) {
-            printf("Imposible borrar fichero: %s\n", strerror(errno));
+        for (int i = 0; i < nTrozos ; i++) {
+            if (remove(opcion[i]) == -1) {
+                printf("Imposible borrar fichero: %s\n", strerror(errno));
+            }
         }
     }
+    return 1;
 }
 
 int cmdDeltree(char* opcion[], int nTrozos, datos* data){
+    const int MAX_STRING = 150;
+    char string[MAX_STRING];
+    if (nTrozos == 0) {
+        printf("%s\n", getcwd(string, MAX_STRING));
+    } else {
+        for (int i = 0; i < nTrozos ; i++) {
+            if (remove(opcion[i]) == -1) {
+                printf("Imposible borrar fichero: %s\n", strerror(errno));
+            }
+        }
+    }
     return 1;
 }
 

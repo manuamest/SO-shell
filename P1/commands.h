@@ -44,6 +44,8 @@ int cmdList(char* opcion[], int nTrozos, datos* data);
 int cmdDelete(char* opcion[], int nTrozos, datos* data1);
 int cmdDeltree(char* opcion[], int nTrozos, datos* data);
 int cmdExit(char* opcion[], int nTrozos, datos* data);
+void printfInfo(char* path, bool lng, bool acc, bool link, bool hid);
+void recursive(char* path, bool lng, bool acc, bool link, bool hid, bool reca, bool recb);
 int TrocearCadena(char* cadena, char* trozos[]);
 
 #endif //SOP0_COMMANDS_H
