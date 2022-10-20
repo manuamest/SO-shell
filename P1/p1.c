@@ -33,9 +33,9 @@ int main() {
     int nTrozos;
     tList lista;
     createEmptyList(&lista);
-    datos data = { lista, true, 0 };
+    datos data = { lista, false, 0 };
 
-    while (data.finished) {
+    while (!data.finished) {
         //prints a promt
         printPrompt();
         readEntry(line, &data);
