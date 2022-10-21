@@ -28,8 +28,6 @@ struct cmdEntry{
 };
 extern struct cmdEntry cmdTable[];
 int execute(char* trozos[], int nTrozos, datos* data);
-//void processCmd(bool* finished, char* trozos[], tList *L, int* cmdNumber, int nTrozos);
-void cmdError();
 int cmdAutores(char* opcion[], int nTrozos, datos* data);
 int cmdPid(char* opcion[], int nTrozos, datos* data);
 int cmdCarpeta(char* opcion[], int nTrozos, datos* data);
@@ -44,8 +42,6 @@ int cmdList(char* opcion[], int nTrozos, datos* data);
 int cmdDelete(char* opcion[], int nTrozos, datos* data1);
 int cmdDeltree(char* opcion[], int nTrozos, datos* data);
 int cmdExit(char* opcion[], int nTrozos, datos* data);
-void printfInfo(char* path, bool lng, bool acc, bool link, bool hid);
-void recursive(char* path, bool lng, bool acc, bool link, bool hid, bool reca, bool recb);
 int TrocearCadena(char* cadena, char* trozos[]);
 
 #endif //SOP0_COMMANDS_H
