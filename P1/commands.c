@@ -319,18 +319,24 @@ int cmdStat(char* opcion[], int nTrozos, datos* data){
     return 1;
 }
 
-void recursive(char* path, bool lng, bool acc, bool link, bool hid, bool reca, bool recb){
+int isDirectory(const char *path) {
+    struct stat statbuf;
+    if (stat(path, &statbuf) != 0)
+        return 0;
+    return S_ISDIR(statbuf.st_mode);
+}
+
+void recursive(char* path, bool lng, bool acc, bool link, bool hid, bool reca, bool recb) {
     DIR *d;
-    struct dirent* itemInfo;
+    struct dirent *itemInfo;
 
     struct stat data;
     lstat(path, &data);     // para el S_ISDIR()
 
 
-    if(!S_ISDIR(data.st_mode))       // si originalmente se metió un archivo en recursive() en lugar de un directorio
+    if (!S_ISDIR(data.st_mode))       // si originalmente se metió un archivo en recursive() en lugar de un directorio
         printfInfo(path, lng, acc, link, hid);
-
-    else if((d = opendir(path)) == NULL)           // si hubo fallo al abrir el directorio
+    else if ((d = opendir(path)) == NULL)           // si hubo fallo al abrir el directorio
         printf("%s\n", strerror(errno));
 
     else if (reca) {
@@ -347,7 +353,7 @@ void recursive(char* path, bool lng, bool acc, bool link, bool hid, bool reca, b
             printfInfo(new_path, lng, acc, link, hid);
             new_path [len - 1] = '\0';
         }
-
+        closedir(d);
         if((d = opendir(path)) == NULL)
             printf("%s\n", strerror(errno));
 
@@ -361,10 +367,7 @@ void recursive(char* path, bool lng, bool acc, bool link, bool hid, bool reca, b
                 }
             }
         }
-
-    }
-
-    else if (recb) {
+    }else if (recb) {
 
         char new_path[150];
         int len;
@@ -372,47 +375,42 @@ void recursive(char* path, bool lng, bool acc, bool link, bool hid, bool reca, b
         strcpy(new_path, strcat(path, "/"));
         path[strlen(path) - 1] = '\0';      // eliminar el "/" que se acaba de colocar en path
         len = strlen(new_path) + 1;
-
         while ((itemInfo = readdir(d)) != NULL) {
-            if ((itemInfo->d_name[0] == '.' || itemInfo->d_name[strlen(itemInfo->d_name)-1] == '~') && !hid);
+            if ((itemInfo->d_name[0] == '.' || itemInfo->d_name[strlen(itemInfo->d_name) - 1] == '~') && !hid);
             else {
-                if(itemInfo->d_type == DT_DIR && strcmp(itemInfo->d_name, "..") != 0 && strcmp(itemInfo->d_name, ".") != 0) {  // entramos a los directorios de la carpeta introducida y mostramos sus elementos
-                    strcat(new_path, itemInfo->d_name);
-                    recursive(new_path, lng, acc, link, hid, reca, recb);
-                    new_path [len - 1] = '\0';
+                if (itemInfo->d_type == DT_DIR && strcmp(itemInfo->d_name, "..") != 0 &&
+                        strcmp(itemInfo->d_name, ".") != 0) {  // entramos a los directorios de la carpeta introducida y mostramos sus elementos
+                        strcat(new_path, itemInfo->d_name);
+                        recursive(new_path, lng, acc, link, hid, reca, recb);
+                        new_path[len - 1] = '\0';
                 }
             }
         }
-
         printf("************%s\n", path);
-
-        if((d = opendir(path)) == NULL)
+        closedir(d);
+        if ((d = opendir(path)) == NULL)
             printf("%s\n", strerror(errno));
 
         while ((itemInfo = readdir(d)) != NULL) {
             strcat(new_path, itemInfo->d_name);
             printfInfo(new_path, lng, acc, link, hid);
-            new_path [len - 1] = '\0';
+            new_path[len - 1] = '\0';
         }
+    } else {      // si no se usa ni -reca ni -recb sólo mostramos lo del directorio dado
+            char new_path[150];
+            int len;
 
-    }
+            strcpy(new_path, strcat(path, "/"));
+            path[strlen(path) - 1] = '\0';      // eliminar el "/" que se acaba de colocar en path
+            len = strlen(new_path) + 1;
 
-    else {      // si no se usa ni -reca ni -recb sólo mostramos lo del directorio dado
+            printf("************%s\n", path);
 
-        char new_path[150];
-        int len;
-
-        strcpy(new_path, strcat(path, "/"));
-        path[strlen(path) - 1] = '\0';      // eliminar el "/" que se acaba de colocar en path
-        len = strlen(new_path) + 1;
-
-        printf("************%s\n", path);
-
-        while ((itemInfo = readdir(d)) != NULL) {
-            strcat(new_path, itemInfo->d_name);
-            printfInfo(new_path, lng, acc, link, hid);
-            new_path [len - 1] = '\0';
-        }
+            while ((itemInfo = readdir(d)) != NULL) {
+                strcat(new_path, itemInfo->d_name);
+                printfInfo(new_path, lng, acc, link, hid);
+                new_path[len - 1] = '\0';
+            }
     }
     closedir(d);
 }
@@ -496,12 +494,6 @@ int cmdDelete(char* opcion[], int nTrozos, datos* data1){
     return 1;
 }
 
-int isDirectory(const char *path) {
-    struct stat statbuf;
-    if (stat(path, &statbuf) != 0)
-        return 0;
-    return S_ISDIR(statbuf.st_mode);
-}
 
 int removeRecursivo(char* directory) {
     DIR *d;
