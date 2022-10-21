@@ -1,5 +1,5 @@
 EXE_NAME = shell
-CFLAGS = -Wall
+CFLAGS = -Wall -g
 CC = gcc
 
 all: clean shell

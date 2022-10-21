@@ -414,6 +414,7 @@ void recursive(char* path, bool lng, bool acc, bool link, bool hid, bool reca, b
             new_path [len - 1] = '\0';
         }
     }
+    closedir(d);
 }
 
 int cmdList(char* opcion[], int nTrozos, datos* data){
