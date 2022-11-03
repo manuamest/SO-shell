@@ -1,0 +1,3 @@
+/home/manuamest/Documentos/UNI/SO/PRACTICAS/P0/VERSIONES/VERSIONES DEFINITIVAS/P2/cmake-build-debug/CMakeFiles/PRACTICASSO.dir
+/home/manuamest/Documentos/UNI/SO/PRACTICAS/P0/VERSIONES/VERSIONES DEFINITIVAS/P2/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/manuamest/Documentos/UNI/SO/PRACTICAS/P0/VERSIONES/VERSIONES DEFINITIVAS/P2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
