@@ -27,12 +27,12 @@ void insertItem(tItemL d, tList *L) {
     if (createNode(&q)){
         q->data = d;
         q->next = LNULL;
-        if(*L == LNULL) {
+        if(*L == LNULL) {                   // TODO: esto vale para el nodo cabeza? no debería ser isEmptyList ya que la lista vacía ya tiene algo?
             *L = q;
         } else {
             for (r = *L; r->next != LNULL; r = r->next);
 
-            r->next = q;        // si la hay, inserta el elemento al final de la cola.
+            r->next = q;        // si hay memoria disponible, inserta el elemento al final de la cola.
         }
     }
 }
@@ -49,7 +49,9 @@ tPosL findItem(tItemL d, tList L) {
     return p;
 }
 
-tItemL getItem(tPosL p, tList L) { return p->data; }
+tItemL getItem(tPosL p, tList L) {
+    return p->data;
+}
 
 tPosL first(tList L) {
     return L->next;  // el nodo cabeza está vacío. El primer elemento no vacío está en el segundo nodo

@@ -1,6 +1,7 @@
 /* Jose Manuel Amestoy Lopez: manuel.amestoy@udc.es
  * Lucia Alvarez Garcia: l.alvarezg@udc.es */
 #include <stdbool.h>
+#include <time.h>
 
 #define LNULL NULL
 
@@ -9,6 +10,13 @@ typedef char tCommand[1024];
 typedef struct tItemL {
     int number;
     tCommand command;
+    void* blockAddress;
+    int blockSize;
+    struct tm allocTime;
+    int allocType;          // 1 = malloc, 2 = shared, 3 = mapped
+    int keySh;
+    char fileName[100];
+    int fileDescriptor;
 } tItemL;
 
 typedef struct tNode* tPosL;

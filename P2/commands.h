@@ -18,7 +18,7 @@
 #include "list.h"
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include "ayudaP2.c"
+//#include "ayudaP2.c"
 #ifndef SOP0_COMMANDS_H
 #define SOP0_COMMANDS_H
 #define NCOMMANDS 23

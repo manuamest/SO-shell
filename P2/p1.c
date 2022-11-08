@@ -31,9 +31,10 @@ int main() {
     char line[1024];
     char* trozos[128];
     int nTrozos;
-    tList lista;
+    tList lista, memList;
     createEmptyList(&lista);
-    datos data = { lista, false, 0 };
+    createEmptyList(&memList);
+    datos data = { lista, memList, false, 0 };
 
     while (!data.finished) {
         //prints a promt

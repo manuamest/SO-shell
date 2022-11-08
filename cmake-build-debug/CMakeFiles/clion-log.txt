@@ -1,1 +1,1 @@
-CMakeLists.txt not found in /home/manuamest/Documentos/UNI/SO/PRACTICAS/P0/VERSIONES/VERSIONES DEFINITIVAS Select CMakeLists.txt
+CMakeLists.txt not found in /home/lucia/Escritorio/SO/gitSO Select CMakeLists.txt

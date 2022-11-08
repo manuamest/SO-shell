@@ -584,9 +584,166 @@ int cmdDeltree(char* opcion[], int nTrozos, datos* data){
     return 1;
 }
 
-int cmdAllocate(char* opcion[], int nTrozos, datos* data) {}
+void list_Allocations(int type, tList memList) {
+    char* listType;
+    switch (type) {
+        case 1: listType = "malloc"; break;
+        case 2: listType = "shared"; break;
+        case 3: listType = "mmap"; break;
+        default: listType = ""; break;
+    }
 
-int cmdDeallocate(char* opcion[], int nTrozos, datos* data) {}
+    if (type >= 0 && type <= 3) {
+        if(type == 0)
+            printf("******Lista de bloques asignados para el proceso %d\n", getpid());
+        else
+            printf("******Lista de bloques asignados %s para el proceso %d\n", listType, getpid());
+
+        if(!isEmptyList(memList)){
+            for(tPosL i = first(memList); i != NULL; i = i->next) {
+                if(type == 0 || i->data.allocType == type) {
+                    char* month;
+                    switch (i->data.allocTime.tm_mon) {
+                        case 0: month = "Jan"; break;
+                        case 1: month = "Feb"; break;
+                        case 2: month = "Mar"; break;
+                        case 3: month = "Apr"; break;
+                        case 4: month = "May"; break;
+                        case 5: month = "Jun"; break;
+                        case 6: month = "Jul"; break;
+                        case 7: month = "Aug"; break;
+                        case 8: month = "Sep"; break;
+                        case 9: month = "Oct"; break;
+                        case 10: month = "Nov"; break;
+                        case 11: month = "Dec"; break;
+                    }
+
+                    if(i->data.allocType == 1) listType = "malloc";
+                    else if(i->data.allocType == 2) listType = "shared";
+                    else if(i->data.allocType == 3) listType = "mmap";
+
+                    printf("      %-29p %d %3s %2d %2d:%2d %s\n", i->data.blockAddress, i->data.blockSize, month,
+                           i->data.allocTime.tm_mday, i->data.allocTime.tm_hour, i->data.allocTime.tm_min, listType);
+                }
+            }
+        }
+    }
+    else {
+        printf("uso: allocate [-malloc|-shared|-createshared|-mmap] ....\n");
+    }
+
+
+}
+
+int cmdAllocate(char* opcion[], int nTrozos, datos* data) {
+    if(nTrozos == 1)
+        list_Allocations(0, data->memoryList);
+    else{
+        if(strcmp(opcion[0], "-malloc") == 0) {
+            if(nTrozos == 2)
+                list_Allocations(1, data->memoryList);
+            else {
+                int tam = strtol(opcion[1], NULL, 10);
+                if(tam == 0)
+                    printf("No se asignan bloques de 0 bytes\n");
+                else {
+                    void* dir = malloc(tam);
+                    if(dir == NULL)
+                        printf("No queda suficiente espacio para reservar tanta memoria.\n");
+                    else {
+                        time_t t = time(NULL);              // creamos el nuevo item y lo metemos en la lista
+                        tItemL item;
+                        item.blockAddress = dir;
+                        item.blockSize = tam;
+                        item.allocTime = *localtime(&t);
+                        item.allocType = 1;     // == malloc
+                        insertItem(item, &data->memoryList);
+                        printf("Asignados %d bytes en %p\n", tam, dir);
+                    }
+                }
+            }
+        }
+        else if(strcmp(opcion[0], "-shared") == 0) {
+            if(nTrozos == 2)
+                list_Allocations(2, data->memoryList);
+            else {
+                // función shared
+            }
+        }
+        else if(strcmp(opcion[0], "-mmap") == 0) {
+            if(nTrozos == 2)
+                list_Allocations(3, data->memoryList);
+            else {
+                // función mmap
+            }
+        }
+        else
+            printf("uso: allocate [-malloc|-shared|-createshared|-mmap] ....\n");
+    }
+
+    return 1;
+}
+
+int cmdDeallocate(char* opcion[], int nTrozos, datos* data) {
+    if(nTrozos == 1)
+        list_Allocations(0, data->memoryList);
+    else {
+        if (strcmp(opcion[0], "-malloc") == 0) {
+            //funcion malloc
+            if (nTrozos == 2)
+                list_Allocations(1, data->memoryList);
+            else {
+                char* ptr;
+                long tam = strtol(opcion[1], &ptr, 10);
+                if(tam == 0)
+                    printf("No se asignan bloques de 0 bytes\n");
+                else {
+                    tPosL i;
+                    if(!isEmptyList(data->memoryList)) {
+                        for(i = first(data->memoryList); i->next != NULL && getItem(i, data->memoryList).blockSize != tam; i = i->next);
+                        if(getItem(i, data->memoryList).blockSize == tam) {
+                            tItemL item = getItem(i, data->memoryList);
+                            deleteAtPosition(i, &data->memoryList);     // eliminamos el item de la lista y hacemos free de la dir de mem
+                            free(item.blockAddress);
+                        }
+                        else
+                            printf("No hay bloque de ese tamano asignado con malloc\n");
+                    }
+                    else
+                        printf("No hay bloque de ese tamano asignado con malloc\n");
+                }
+            }
+        }
+        else if (strcmp(opcion[0], "-shared") == 0) {
+            if (nTrozos == 2)
+                list_Allocations(2, data->memoryList);
+            else {
+                // función shared
+            }
+        }
+        else if (strcmp(opcion[0], "-mmap") == 0) {
+            if (nTrozos == 2)
+                list_Allocations(3, data->memoryList);
+            else {
+                // función mmap
+            }
+        }
+        else {
+            //función addr
+            // TODO: no funciona
+            tPosL i;
+            void* ptr;
+            sscanf(opcion[1], "%p", &ptr);
+            for(i = first(data->memoryList); i != NULL && getItem(i, data->memoryList).blockAddress != ptr; i = i->next);
+            if(i != NULL) {
+                free(ptr);
+                deleteAtPosition(i, &data->memoryList);
+            }
+            else printf("Direccion %p no asignada con malloc, shared o mmap", opcion[1]);
+        }
+    }
+    return 1;
+}
 
 int cmdio(char* opcion[], int nTrozos, datos* data){}
 

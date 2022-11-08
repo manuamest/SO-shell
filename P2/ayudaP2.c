@@ -2,23 +2,23 @@
 
 void Recursiva (int n)
 {
-  char automatico[TAMANO];
-  static char estatico[TAMANO];
+    char automatico[TAMANO];
+    static char estatico[TAMANO];
 
-  printf ("parametro:%3d(%p) array %p, arr estatico %p\n",n,&n,automatico, estatico);
+    printf ("parametro:%3d(%p) array %p, arr estatico %p\n",n,&n,automatico, estatico);
 
-  if (n>0)
-    Recursiva(n-1);
+    if (n>0)
+        Recursiva(n-1);
 }
 
 
 void LlenarMemoria (void *p, size_t cont, unsigned char byte)
 {
-  unsigned char *arr=(unsigned char *) p;
-  size_t i;
+    unsigned char *arr=(unsigned char *) p;
+    size_t i;
 
-  for (i=0; i<cont;i++)
-		arr[i]=byte;
+    for (i=0; i<cont;i++)
+        arr[i]=byte;
 }
 
 void * ObtenerMemoriaShmget (key_t clave, size_t tam)
@@ -130,14 +130,14 @@ ssize_t LeerFichero (char *f, void *p, size_t cont)
    int df,aux;
 
    if (stat (f,&s)==-1 || (df=open(f,O_RDONLY))==-1)
-	return -1;     
+       return -1;
    if (cont==-1)   /* si pasamos -1 como bytes a leer lo leemos entero*/
-	cont=s.st_size;
+       cont=s.st_size;
    if ((n=read(df,p,cont))==-1){
-	aux=errno;
-	close(df);
-	errno=aux;
-	return -1;
+       aux=errno;
+       close(df);
+       errno=aux;
+       return -1;
    }
    close (df);
    return n;
@@ -149,17 +149,17 @@ void do_I_O_read (char *ar[])
    size_t cont=-1;
    ssize_t n;
    if (ar[0]==NULL || ar[1]==NULL){
-	printf ("faltan parametros\n");
-	return;
+       printf ("faltan parametros\n");
+       return;
    }
    p=strtol(ar[1], NULL, 10);  /*convertimos de cadena a puntero*/
    if (ar[2]!=NULL)
-	cont=(size_t) atoll(ar[2]);
+       cont=(size_t) atoll(ar[2]);
 
    if ((n=LeerFichero(ar[0],p,cont))==-1)
-	perror ("Imposible leer fichero");
+       perror ("Imposible leer fichero");
    else
-	printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[0],p);
+       printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[0],p);
 }
 
 ssize_t EscribirFichero (char *f, void *p, size_t cont,int overwrite)
@@ -168,16 +168,16 @@ ssize_t EscribirFichero (char *f, void *p, size_t cont,int overwrite)
    int df,aux, flags=O_CREAT | O_EXCL | O_WRONLY;
 
    if (overwrite)
-	flags=O_CREAT | O_WRONLY | O_TRUNC;
+       flags=O_CREAT | O_WRONLY | O_TRUNC;
 
    if ((df=open(f,flags,0777))==-1)
-	return -1;
+       return -1;
 
    if ((n=write(df,p,cont))==-1){
-	aux=errno;
-	close(df);
-	errno=aux;
-	return -1;
+       aux=errno;
+       close(df);
+       errno=aux;
+       return -1;
    }
    close (df);
    return n;
@@ -192,25 +192,25 @@ void Do_pmap (void) /*sin argumentos*/
    
    sprintf (elpid,"%d", (int) getpid());
    if ((pid=fork())==-1){
-      perror ("Imposible crear proceso");
-      return;
-      }
+       perror ("Imposible crear proceso");
+       return;
+   }
    if (pid==0){
-      if (execvp(argv[0],argv)==-1)
-         perror("cannot execute pmap (linux, solaris)");
-         
-      argv[0]="procstat"; argv[1]="vm"; argv[2]=elpid; argv[3]=NULL;   
-      if (execvp(argv[0],argv)==-1)/*No hay pmap, probamos procstat FreeBSD */
-         perror("cannot execute procstat (FreeBSD)");
-         
-      argv[0]="procmap",argv[1]=elpid;argv[2]=NULL;    
-            if (execvp(argv[0],argv)==-1)  /*probamos procmap OpenBSD*/
-         perror("cannot execute procmap (OpenBSD)");
-         
-      argv[0]="vmmap"; argv[1]="-interleave"; argv[2]=elpid;argv[3]=NULL;
-      if (execvp(argv[0],argv)==-1) /*probamos vmmap Mac-OS*/
-         perror("cannot execute vmmap (Mac-OS)");      
-      exit(1);
-  }
-  waitpid (pid,NULL,0);
+       if (execvp(argv[0],argv)==-1)
+           perror("cannot execute pmap (linux, solaris)");
+
+       argv[0]="procstat"; argv[1]="vm"; argv[2]=elpid; argv[3]=NULL;
+       if (execvp(argv[0],argv)==-1)/*No hay pmap, probamos procstat FreeBSD */
+           perror("cannot execute procstat (FreeBSD)");
+
+       argv[0]="procmap",argv[1]=elpid;argv[2]=NULL;
+       if (execvp(argv[0],argv)==-1)  /*probamos procmap OpenBSD*/
+           perror("cannot execute procmap (OpenBSD)");
+
+       argv[0]="vmmap"; argv[1]="-interleave"; argv[2]=elpid;argv[3]=NULL;
+       if (execvp(argv[0],argv)==-1) /*probamos vmmap Mac-OS*/
+           perror("cannot execute vmmap (Mac-OS)");
+       exit(1);
+   }
+   waitpid (pid,NULL,0);
 }

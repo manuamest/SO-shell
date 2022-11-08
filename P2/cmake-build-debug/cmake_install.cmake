@@ -1,4 +1,4 @@
-# Install script for directory: /home/manuamest/Documentos/UNI/SO/PRACTICAS/P0/VERSIONES/VERSIONES DEFINITIVAS/P2
+# Install script for directory: /home/lucia/Escritorio/SO/gitSO/P2
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/manuamest/Documentos/UNI/SO/PRACTICAS/P0/VERSIONES/VERSIONES DEFINITIVAS/P2/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
