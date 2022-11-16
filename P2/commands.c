@@ -744,13 +744,223 @@ int cmdDeallocate(char* opcion[], int nTrozos, datos* data) {
     }
     return 1;
 }
+//----------------------------------------------||I-O||--------------------------------------
+ssize_t LeerFichero (char *f, void *p, size_t cont)
+{
+    struct stat s;
+    ssize_t  n;
+    int df,aux;
 
-int cmdio(char* opcion[], int nTrozos, datos* data){}
+    if (stat (f,&s)==-1 || (df=open(f,O_RDONLY))==-1)
+        return -1;
+    if (cont==-1)   /* si pasamos -1 como bytes a leer lo leemos entero*/
+        cont=s.st_size;
+    if ((n=read(df,p,cont))==-1){
+        aux=errno;
+        close(df);
+        errno=aux;
+        return -1;
+    }
+    close (df);
+    return n;
+}
+void do_I_O_read (char *ar[])
+{
+    void *p;
+    size_t cont=-1;
+    ssize_t n;
+    if (ar[0]==NULL || ar[1]==NULL){
+        printf ("faltan parametros\n");
+        return;
+    }
+    p=cadtop(ar[1]);  /*convertimos de cadena a puntero*/
+    if (ar[2]!=NULL)
+        cont=(size_t) atoll(ar[2]);
 
-int cmdMemdump(char* opcion[], int nTrozos, datos* data){}
+    if ((n=LeerFichero(ar[0],p,cont))==-1)
+        perror ("Imposible leer fichero");
+    else
+        printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[0],p);
+}
+ssize_t EscribirFichero (char *fich, void *p, ssize_t n){
+    ssize_t nescritos,tam=n;
+    int df, aux;
+    df=open(fich,O_RDWR);
+    if((nescritos=write(df,p,tam))==-1){
+        aux=errno;
+        close(df);
+        errno=aux;
+        return -1;
+    }
+    close (df);
+    return (nescritos);
+}
+int cmdio(char* opcion[], int nTrozos, datos* data){
+    if(nTrozos !=0){
+        char *ptr;
+        if(strcmp(opcion[0], "read")== 0){
+            if(nTrozos >= 3){
+                do_I_O_read(opcion);
+            }
+        }else if(strcmp(opcion[0], "write")== 0){
+            void *p;
+            int cont = ((ssize_t)-1);
+            ssize_t n;
+            p=cadtop(opcion[2]);  /*convertimos de cadena a puntero*/
+            if (opcion[3]!=NULL)
+                cont=(ssize_t) atoll(opcion[3]);
+            if((strcmp(opcion[1], "-o")==0)){
+                if (opcion[2]==NULL || opcion[3]==NULL){
+                    printf ("faltan parametros\n");
+                    return 0;
+                }
+                creat(opcion[2], 0777);
+                if((n = EscribirFichero(opcion[2], p, cont)) == -1)
+                    perror("error de escritura");
+                else
+                    printf("escritos %lld bytes\n", (long long) n);
+            }else if(open(opcion[1],O_RDWR)==-1){
+                creat(opcion[1], 0666);
+                if((n = EscribirFichero(opcion[1], p, cont)) == -1)
+                    perror("error de escritura");
+                else
+                    printf("escritos %lld bytes\n", (long long) n);
+            }
+        }
+    }
+    else printf("uso: e-s [read|write] ......\n");
+    return 0;
+}
+#include "limits.h"
 
-int cmdMemfill(char* opcion[], int nTrozos, datos* data){}
+int cmdMemdump(char* opcion[], int nTrozos, datos* data){//Revisar
+    if(nTrozos !=0){
+        int cont = 25;
+        char *ptr;
+        if (opcion[1]!=NULL) cont = atoi(opcion[1]);
+        unsigned long addr = strtoul(opcion[0],&ptr,16);//Unsgined
 
-int cmdMemory(char* opcion[], int nTrozos, datos* data){}
+        for(int i=0; i < cont; i+=25){
+            long aux = addr;
+            for(int j=0;j<25 && i+j < cont; j++){
+                printf(" %c ", (*(char *)aux == '\n')? ' ' : *(char *)aux);
+                aux ++;
+            }
+            printf("\n");
+            for(int j=0;j < 25 && i+j < cont; j++){
+                printf("%02X ", *(char *)addr);
+                addr ++;
+            }
+            printf("\n");
+        }
 
-int cmdRecurse(char* opcion[], int nTrozos, datos* data){}
+    }else
+        perror("Error dump: Address not specified\n");
+    return 0;
+}
+
+int cmdMemfill(char* opcion[], int nTrozos, datos* data){
+    if(nTrozos !=0){
+        char *ptr;
+        int n = 128;
+        int c = 65;
+        if(nTrozos >= 2 ) n = atoi(opcion[1]);
+        if(nTrozos > 2 ){
+            c = atoi(opcion[2]);
+            /*if(isNumber(opcion[2])) c = atoi(opcion[2]);
+            else c = strtoul(opcion[2],&ptr,16);*/
+        }
+
+        long addr = strtoul(opcion[0],&ptr,16);
+        for(int i=0;i<n;i++){
+            *(int *)addr = c;
+            addr ++;
+        }
+    }else {
+        perror("Error llenar: Address not specified\n");
+        return -1;
+    }
+    return 0;
+}
+
+int global1=0,global2=0,global3=0;
+void Do_pmap (void) /*sin argumentos*/
+{ pid_t pid;       /*hace el pmap (o equivalente) del proceso actual*/
+    char elpid[32];
+    char *argv[4]={"pmap",elpid,NULL};
+
+    sprintf (elpid,"%d", (int) getpid());
+    if ((pid=fork())==-1){
+        perror ("Imposible crear proceso");
+        return;
+    }
+    if (pid==0){
+        if (execvp(argv[0],argv)==-1)
+            perror("cannot execute pmap (linux, solaris)");
+
+        argv[0]="procstat"; argv[1]="vm"; argv[2]=elpid; argv[3]=NULL;
+        if (execvp(argv[0],argv)==-1)/*No hay pmap, probamos procstat FreeBSD */
+            perror("cannot execute procstat (FreeBSD)");
+
+        argv[0]="procmap",argv[1]=elpid;argv[2]=NULL;
+        if (execvp(argv[0],argv)==-1)  /*probamos procmap OpenBSD*/
+            perror("cannot execute procmap (OpenBSD)");
+
+        argv[0]="vmmap"; argv[1]="-interleave"; argv[2]=elpid;argv[3]=NULL;
+        if (execvp(argv[0],argv)==-1) /*probamos vmmap Mac-OS*/
+            perror("cannot execute vmmap (Mac-OS)");
+        exit(1);
+    }
+    waitpid (pid,NULL,0);
+}
+int cmdMemory(char* opcion[], int nTrozos, datos* data){//Revisar
+    if(opcion[0] != NULL){
+        for(int i=0;i<nTrozos;i++){
+            if(strcmp(opcion[i], "-vars")== 0){//Revisar variables
+                auto int x=0,y=0,z=0;
+                static int a=0,b=0,c=0;
+
+                printf("automatic variables:\t%p, %p, %p\n", &x, &y, &z);
+                printf("static variables:\t%p, %p, %p\n", &a, &b, &c);
+                printf("global variables:\t%p, %p, %p\n", &global1, &global2, &global3);
+
+            }if(strcmp(opcion[i], "-funcs")== 0){//Revisar funciones
+                printf("program functions:\t%p, %p, %p\n", cmdAutores, cmdPid, cmdInfosis);
+                printf("library functions:\t%p, %p, %p\n", malloc, printf, strcmp);
+
+            }if(strcmp(opcion[i], "-blocks")== 0){//Revisar si pide esto
+                cmdDeallocate(NULL, 0, data);
+
+            }else if(strcmp(opcion[i], "-all")== 0){//Revisar si borrar
+                char *input[] = {"-vars","-funcs", "-blocks"};
+                cmdMemory(input, 3, data);
+
+            }else if(strcmp(opcion[i], "-pmap")== 0){
+                Do_pmap();
+            }
+        }
+    }else{
+        char *input[] = {"-vars","-funcs", "-blocks"};//{"-all"};
+        cmdMemory(input, 1, data);
+    }
+    return 0;
+}
+#define TAMANO 2048
+void Recursiva (int n)
+{
+    char automatico[TAMANO];
+    static char estatico[TAMANO];
+
+    printf ("parametro:%3d(%p) array %p, arr estatico %p\n",n,&n,automatico, estatico);
+
+    if (n>0)
+        Recursiva(n-1);
+}
+int cmdRecurse(char* opcion[], int nTrozos, datos* data){
+    if(nTrozos !=0){
+        //TODO: comprobar q opcion 0 es un numero
+        int num = atoi(opcion[0]);
+        Recursiva(num);
+    }else printf("uso: recursiva n\n");
+    return 0;
+}
