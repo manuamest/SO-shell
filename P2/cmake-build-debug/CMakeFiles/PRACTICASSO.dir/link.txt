@@ -1,0 +1,3 @@
+"C:\Program Files\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\PRACTICASSO.dir/objects.a
+C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\ar.exe qc CMakeFiles\PRACTICASSO.dir/objects.a @CMakeFiles\PRACTICASSO.dir\objects1.rsp
+C:\PROGRA~1\JETBRA~1\CLION2~1.3\bin\mingw\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\PRACTICASSO.dir/objects.a -Wl,--no-whole-archive -o PRACTICASSO.exe -Wl,--out-implib,libPRACTICASSO.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\PRACTICASSO.dir\linklibs.rsp
