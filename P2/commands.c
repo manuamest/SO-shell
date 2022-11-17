@@ -34,7 +34,7 @@ struct cmdEntry cmdTable[] = {
                                       "\t-delkey cl: elimina del sistema (sin desmapear) la clave de memoria cl\n"
                                       "\t-mmap fich: desmapea el fichero mapeado fich\n"
                                       "\taddr: desasigna el bloque de memoria en la direccion addr"},
-        /*{"i-o", cmdio, "uso: i-o [read|write] [-o] fiche addr cont \n"
+        {"i-o", cmdio, "uso: i-o [read|write] [-o] fiche addr cont \n"
                        "\tread fich addr cont: Lee cont bytes desde fich a addr\n"
                        "\twrite [-o] fich addr cont: Escribe cont bytes desde addr a fich. -o para sobreescribir\n"
                        "\t\taddr es una direccion de memoria"},
@@ -46,7 +46,7 @@ struct cmdEntry cmdTable[] = {
                               "\t\t-vars: las direcciones de las variables\n"
                               "\t\t:-all: todo\n"
                               "\t\t-pmap: muestra la salida del comando pmap(o similar)"},
-        {"recurse", cmdRecurse, "uso: recurse [n]\tInvoca a la funcion recursiva n veces"},*/
+        {"recurse", cmdRecurse, "uso: recurse [n]\tInvoca a la funcion recursiva n veces"},
         {NULL, NULL, NULL}
 };
 
@@ -190,7 +190,7 @@ int cmdAyuda(char* opcion[], int nTrozos, datos* data){
         printf("'ayuda cmd' donde cmd es uno de los siguientes comandos:\n"
                "fin salir bye fecha pid autores hist comando carpeta infosis ayuda \n");
     } else {
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < NCOMMANDS; i++) {
             if (strcmp(opcion[0], cmdTable[i].name) == 0) {
                 printf("%s", cmdTable[i].ayuda);
                 break;
@@ -979,24 +979,32 @@ ssize_t LeerFichero (char *f, void *p, size_t cont)
     close (df);
     return n;
 }
+
+long cadtop(char* addr[]) {
+    char* ptr;
+    addr = strtoul(addr, &ptr, 16);
+}
+
 void do_I_O_read (char *ar[])
 {
     void *p;
     size_t cont=-1;
     ssize_t n;
-    if (ar[0]==NULL || ar[1]==NULL){
+    if (ar[1]==NULL || ar[2]==NULL){
         printf ("faltan parametros\n");
         return;
     }
-    p=cadtop(ar[1]);  /*convertimos de cadena a puntero*/
-    if (ar[2]!=NULL)
-        cont=(size_t) atoll(ar[2]);
 
-    if ((n=LeerFichero(ar[0],p,cont))==-1)
+    p=cadtop(ar[2]);  /*convertimos de cadena a puntero*/
+    if (ar[3]!=NULL)
+        cont=(size_t) atoll(ar[3]);
+
+    if ((n=LeerFichero(ar[1],p,cont))==-1)
         perror ("Imposible leer fichero");
     else
         printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[0],p);
 }
+
 ssize_t EscribirFichero (char *fich, void *p, ssize_t n){
     ssize_t nescritos,tam=n;
     int df, aux;
@@ -1011,13 +1019,24 @@ ssize_t EscribirFichero (char *fich, void *p, ssize_t n){
     return (nescritos);
 }
 int cmdio(char* opcion[], int nTrozos, datos* data){
-    if(nTrozos !=0){
+    if(opcion[0] != NULL){
         char *ptr;
+        if(opcion[1] == NULL) {
+            printf("faltan parametros\n");
+            return -1;
+        }
         if(strcmp(opcion[0], "read")== 0){
-            if(nTrozos >= 3){
+            if(nTrozos >= 4){
                 do_I_O_read(opcion);
+            } else {
+                printf("faltan parametros\n");
+                return -1;
             }
         }else if(strcmp(opcion[0], "write")== 0){
+            if(nTrozos <= 4) {
+                printf("faltan parametros\n");
+                return -1;
+            }
             void *p;
             int cont = ((ssize_t)-1);
             ssize_t n;
@@ -1046,59 +1065,53 @@ int cmdio(char* opcion[], int nTrozos, datos* data){
     else printf("uso: e-s [read|write] ......\n");
     return 0;
 }
-#include "limits.h"
 
-int cmdMemdump(char* opcion[], int nTrozos, datos* data){//Revisar
-    if(nTrozos !=0){
-        int cont = 25;
+int cmdMemdump(char* opcion[], int nTrozos, datos* data){
+    if(opcion[0] != NULL){
         char *ptr;
+        int cont = 25;
         if (opcion[1]!=NULL) cont = atoi(opcion[1]);
-        unsigned long addr = strtoul(opcion[0],&ptr,16);//Unsgined
+        long addr = strtoul(opcion[0],&ptr,16);
 
         for(int i=0; i < cont; i+=25){
             long aux = addr;
-            for(int j=0;j<25 && i+j < cont; j++){
-                printf(" %c ", (*(char *)aux == '\n')? ' ' : *(char *)aux);
+            for(int j = 0; (i+j < cont) && j < 25 ; j++){
+                if(aux != '\n')
+                    printf(" %c ", *(char *) aux);
+                else
+                    printf(" ");
                 aux ++;
             }
             printf("\n");
-            for(int j=0;j < 25 && i+j < cont; j++){
+            for(int j=0;(i+j < cont) && j < 25; j++){
                 printf("%02X ", *(char *)addr);
                 addr ++;
             }
             printf("\n");
         }
-
-    }else
-        perror("Error dump: Address not specified\n");
+    }
     return 0;
 }
-
 int cmdMemfill(char* opcion[], int nTrozos, datos* data){
-    if(nTrozos !=0){
+    if(opcion[0] != NULL){
         char *ptr;
         int n = 128;
         int c = 65;
-        if(nTrozos >= 2 ) n = atoi(opcion[1]);
-        if(nTrozos > 2 ){
+        if(nTrozos >= 3 ) n = atoi(opcion[1]);
+        if(nTrozos == 4 ){
             c = atoi(opcion[2]);
-            *//*if(isNumber(opcion[2])) c = atoi(opcion[2]);
-            else c = strtoul(opcion[2],&ptr,16);*//*
         }
-
         long addr = strtoul(opcion[0],&ptr,16);
+        printf("Llenando %d bytes de memoria con el byte %c(%x) a partir de la direccion %s\n", n,
+               c + '0'-48, c, opcion[0]);
         for(int i=0;i<n;i++){
             *(int *)addr = c;
             addr ++;
         }
-    }else {
-        perror("Error llenar: Address not specified\n");
-        return -1;
     }
     return 0;
 }
 
-int global1=0,global2=0,global3=0;
 void Do_pmap (void) /*sin argumentos*/
 { pid_t pid;       /*hace el pmap (o equivalente) del proceso actual*/
     char elpid[32];
@@ -1128,38 +1141,36 @@ void Do_pmap (void) /*sin argumentos*/
     }
     waitpid (pid,NULL,0);
 }
-int cmdMemory(char* opcion[], int nTrozos, datos* data){//Revisar
+
+int g1=0,g2=0,g3=0;
+int cmdMemory(char* opcion[], int nTrozos, datos* data){
     if(opcion[0] != NULL){
-        for(int i=0;i<nTrozos;i++){
-            if(strcmp(opcion[i], "-vars")== 0){//Revisar variables
-                auto int x=0,y=0,z=0;
+        for(int i=0;i<nTrozos-1;i++){
+            if(strcmp(opcion[i], "-vars")== 0){
+                int x=0,y=0,z=0;
                 static int a=0,b=0,c=0;
-
-                printf("automatic variables:\t%p, %p, %p\n", &x, &y, &z);
-                printf("static variables:\t%p, %p, %p\n", &a, &b, &c);
-                printf("global variables:\t%p, %p, %p\n", &global1, &global2, &global3);
-
-            }if(strcmp(opcion[i], "-funcs")== 0){//Revisar funciones
-                printf("program functions:\t%p, %p, %p\n", cmdAutores, cmdPid, cmdInfosis);
-                printf("library functions:\t%p, %p, %p\n", malloc, printf, strcmp);
-
-            }if(strcmp(opcion[i], "-blocks")== 0){//Revisar si pide esto
-                cmdDeallocate(NULL, 0, data);
-
-            }else if(strcmp(opcion[i], "-all")== 0){//Revisar si borrar
+                printf("Variables locales:\t\t%p, \t%p, \t%p\n", &x, &y, &z);
+                printf("Variables globales:\t\t%p, \t%p, \t%p\n", &g1, &g2, &g3);
+                printf("Variables estaticas:\t\t%p, \t%p, \t%p\n", &a, &b, &c);
+            }if(strcmp(opcion[i], "-funcs")== 0){
+                printf("Funciones programa:\t\t%p, \t%p, \t%p\n", cmdAutores, cmdFecha, cmdCarpeta);
+                printf("Funciones libreria:\t\t%p, \t%p, \t%p\n", printf, scanf, strtoul);
+            }if(strcmp(opcion[i], "-blocks")== 0){
+                list_Allocations(0, data->memoryList);
+            }else if(strcmp(opcion[i], "-all")== 0){
                 char *input[] = {"-vars","-funcs", "-blocks"};
-                cmdMemory(input, 3, data);
-
+                cmdMemory(input, 4, data);
             }else if(strcmp(opcion[i], "-pmap")== 0){
                 Do_pmap();
             }
         }
     }else{
-        char *input[] = {"-vars","-funcs", "-blocks"};//{"-all"};
-        cmdMemory(input, 1, data);
+        char *input[] = {"-vars","-funcs", "-blocks"};
+        cmdMemory(input, 4, data);
     }
     return 0;
 }
+
 #define TAMANO 2048
 void Recursiva (int n)
 {
@@ -1171,11 +1182,11 @@ void Recursiva (int n)
     if (n>0)
         Recursiva(n-1);
 }
+
 int cmdRecurse(char* opcion[], int nTrozos, datos* data){
-    if(nTrozos !=0){
-        //TODO: comprobar q opcion 0 es un numero
+    if(opcion[0] != NULL){
         int num = atoi(opcion[0]);
         Recursiva(num);
-    }else printf("uso: recursiva n\n");
+    }
     return 0;
 }

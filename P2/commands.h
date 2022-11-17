@@ -54,11 +54,11 @@ int cmdList(char* opcion[], int nTrozos, datos* data);
 int cmdDelete(char* opcion[], int nTrozos, datos* data1);
 int cmdDeltree(char* opcion[], int nTrozos, datos* data);
 int cmdAllocate(char* opcion[], int nTrozos, datos* data);
-int cmdDeallocate(char* opcion[], int nTrozos, datos* data);/*
+int cmdDeallocate(char* opcion[], int nTrozos, datos* data);
 int cmdio(char* opcion[], int nTrozos, datos* data);
 int cmdMemdump(char* opcion[], int nTrozos, datos* data);
 int cmdMemfill(char* opcion[], int nTrozos, datos* data);
 int cmdMemory(char* opcion[], int nTrozos, datos* data);
-int cmdRecurse(char* opcion[], int nTrozos, datos* data);*/
+int cmdRecurse(char* opcion[], int nTrozos, datos* data);
 
 #endif //SOP0_COMMANDS_H
