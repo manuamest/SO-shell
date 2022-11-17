@@ -34,7 +34,7 @@ struct cmdEntry cmdTable[] = {
                                       "\t-delkey cl: elimina del sistema (sin desmapear) la clave de memoria cl\n"
                                       "\t-mmap fich: desmapea el fichero mapeado fich\n"
                                       "\taddr: desasigna el bloque de memoria en la direccion addr"},
-        {"i-o", cmdio, "uso: i-o [read|write] [-o] fiche addr cont \n"
+        /*{"i-o", cmdio, "uso: i-o [read|write] [-o] fiche addr cont \n"
                        "\tread fich addr cont: Lee cont bytes desde fich a addr\n"
                        "\twrite [-o] fich addr cont: Escribe cont bytes desde addr a fich. -o para sobreescribir\n"
                        "\t\taddr es una direccion de memoria"},
@@ -46,7 +46,7 @@ struct cmdEntry cmdTable[] = {
                               "\t\t-vars: las direcciones de las variables\n"
                               "\t\t:-all: todo\n"
                               "\t\t-pmap: muestra la salida del comando pmap(o similar)"},
-        {"recurse", cmdRecurse, "uso: recurse [n]\tInvoca a la funcion recursiva n veces"},
+        {"recurse", cmdRecurse, "uso: recurse [n]\tInvoca a la funcion recursiva n veces"},*/
         {NULL, NULL, NULL}
 };
 
@@ -245,6 +245,40 @@ int cmdCreate(char* opcion[], int nTrozos, datos* data){
     return 1;
 }
 
+char LetraTF (mode_t m) {
+    switch (m&S_IFMT) { /*and bit a bit con los bits de formato,0170000 */
+        case S_IFSOCK: return 's'; /*socket */
+        case S_IFLNK: return 'l'; /*symbolic link*/
+        case S_IFREG: return '-'; /* fichero normal*/
+        case S_IFBLK: return 'b'; /*block device*/
+        case S_IFDIR: return 'd'; /*directorio */
+        case S_IFCHR: return 'c'; /*char device*/
+        case S_IFIFO: return 'p'; /*pipe*/
+        default: return '?'; /*desconocido, no deberia aparecer*/
+    }
+}
+
+char* ConvierteModo (mode_t m) {
+    static char permisos[12];
+    strcpy (permisos,"---------- ");
+
+    permisos[0]=LetraTF(m);
+    if (m&S_IRUSR) permisos[1]='r';    /*propietario*/
+    if (m&S_IWUSR) permisos[2]='w';
+    if (m&S_IXUSR) permisos[3]='x';
+    if (m&S_IRGRP) permisos[4]='r';    /*grupo*/
+    if (m&S_IWGRP) permisos[5]='w';
+    if (m&S_IXGRP) permisos[6]='x';
+    if (m&S_IROTH) permisos[7]='r';    /*resto*/
+    if (m&S_IWOTH) permisos[8]='w';
+    if (m&S_IXOTH) permisos[9]='x';
+    if (m&S_ISUID) permisos[3]='s';    /*setuid, setgid y stickybit*/
+    if (m&S_ISGID) permisos[6]='s';
+    if (m&S_ISVTX) permisos[9]='t';
+
+    return permisos;
+}
+
 void printfInfo(char* path, bool lng, bool acc, bool link, bool hid) {
     struct stat data;
 
@@ -290,17 +324,8 @@ void printfInfo(char* path, bool lng, bool acc, bool link, bool hid) {
                     printf("%4lu (%8lu) %8s %8s ", data.st_nlink, data.st_ino, pw->pw_name, gr->gr_name);
                 }
 
-                printf((S_ISDIR(data.st_mode)) ? "d" : "-");
-                printf((data.st_mode & S_IRUSR) ? "r" : "-");
-                printf((data.st_mode & S_IWUSR) ? "w" : "-");
-                printf((data.st_mode & S_IXUSR) ? "x" : "-");
-                printf((data.st_mode & S_IRGRP) ? "r" : "-");
-                printf((data.st_mode & S_IWGRP) ? "w" : "-");
-                printf((data.st_mode & S_IXGRP) ? "x" : "-");
-                printf((data.st_mode & S_IROTH) ? "r" : "-");
-                printf((data.st_mode & S_IWOTH) ? "w" : "-");
-                printf((data.st_mode & S_IXOTH) ? "x" : "-");
-                printf("\t");
+                char* permisos = ConvierteModo(data.st_mode);
+                printf("%s\t", permisos);
                 printf("%8ld  %s", data.st_size, file_name);
 
                 if(link){
@@ -621,7 +646,7 @@ void list_Allocations(int type, tList memList) {
                     else if(i->data.allocType == 2) listType = "shared";
                     else if(i->data.allocType == 3) listType = "mmap";
 
-                    printf("      %-25p %4zu %3s %2d %02d:%02d", i->data.blockAddress, i->data.blockSize, month,
+                    printf("      %-23p %6zu %3s %2d %02d:%02d", i->data.blockAddress, i->data.blockSize, month,
                            i->data.allocTime.tm_mday, i->data.allocTime.tm_hour, i->data.allocTime.tm_min);
 
                     if(i->data.allocType == 1) printf(" malloc");
@@ -686,7 +711,7 @@ void* ObtenerMemoriaShmget (key_t clave, size_t tam, datos* data) {
         errno = aux;
         return NULL;
     }
-    shmctl (id,IPC_STAT,&s);
+    shmctl(id,IPC_STAT,&s);
     insertarNodoShared (&data->memoryList, p, s.shm_segsz, clave);
 
     return (p);
@@ -819,7 +844,7 @@ void do_DeallocateDelkey (char *args[]) {
         return;
     }
     if (shmctl(id, IPC_RMID, NULL) == -1)
-        perror("shmctl: imposible eliminar memoria compartida");
+        perror("shmctl: imposible eliminar memoria compartida\n");
 }
 
 int cmdDeallocate(char* opcion[], int nTrozos, datos* data) {
@@ -863,11 +888,9 @@ int cmdDeallocate(char* opcion[], int nTrozos, datos* data) {
                     if(getItem(i, data->memoryList).keySh == cl) {
                         tItemL item = getItem(i, data->memoryList);
                         if(shmdt(item.blockAddress) == -1)
-                            printf("Error al desmapear la memoria: %s", strerror(errno));
-                        else {
-                            shmctl((int) item.blockAddress, IPC_RMID, NULL);
+                            printf("Error al desmapear la memoria: %s\n", strerror(errno));
+                        else
                             deleteAtPosition(i, &data->memoryList);
-                        }
                     }
                     else
                         printf("No hay bloque de esa clave mapeado en el proceso\n");
@@ -920,12 +943,8 @@ int cmdDeallocate(char* opcion[], int nTrozos, datos* data) {
                 else if(item.allocType == 2) {
                     if(shmdt(item.blockAddress) == -1)
                         printf("Error al desmapear la memoria: %s\n", strerror(errno));
-                    else {
-                        if (shmctl((int) item.blockAddress, IPC_RMID, NULL) == -1)
-                            printf("Error al liberar la memoria: %s\n", strerror(errno));
-                        else
-                            deleteAtPosition(i, &data->memoryList);
-                    }
+                    else
+                        deleteAtPosition(i, &data->memoryList);
                 }
                 else {
                     if(munmap(item.blockAddress, item.blockSize) == -1)
@@ -1063,8 +1082,8 @@ int cmdMemfill(char* opcion[], int nTrozos, datos* data){
         if(nTrozos >= 2 ) n = atoi(opcion[1]);
         if(nTrozos > 2 ){
             c = atoi(opcion[2]);
-            /*if(isNumber(opcion[2])) c = atoi(opcion[2]);
-            else c = strtoul(opcion[2],&ptr,16);*/
+            *//*if(isNumber(opcion[2])) c = atoi(opcion[2]);
+            else c = strtoul(opcion[2],&ptr,16);*//*
         }
 
         long addr = strtoul(opcion[0],&ptr,16);

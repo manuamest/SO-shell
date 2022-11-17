@@ -1,14 +1,12 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/PRACTICASSO.dir/commands.c.obj"
-  "CMakeFiles/PRACTICASSO.dir/commands.c.obj.d"
-  "CMakeFiles/PRACTICASSO.dir/list.c.obj"
-  "CMakeFiles/PRACTICASSO.dir/list.c.obj.d"
-  "CMakeFiles/PRACTICASSO.dir/p1.c.obj"
-  "CMakeFiles/PRACTICASSO.dir/p1.c.obj.d"
-  "PRACTICASSO.exe"
-  "PRACTICASSO.exe.manifest"
+  "CMakeFiles/PRACTICASSO.dir/commands.c.o"
+  "CMakeFiles/PRACTICASSO.dir/commands.c.o.d"
+  "CMakeFiles/PRACTICASSO.dir/list.c.o"
+  "CMakeFiles/PRACTICASSO.dir/list.c.o.d"
+  "CMakeFiles/PRACTICASSO.dir/p1.c.o"
+  "CMakeFiles/PRACTICASSO.dir/p1.c.o.d"
+  "PRACTICASSO"
   "PRACTICASSO.pdb"
-  "libPRACTICASSO.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.
