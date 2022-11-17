@@ -45,5 +45,7 @@ int main() {
         execute(trozos, nTrozos, &data);
     }
     clearOutList(&data.list);
+    clearOutList(&data.memoryList);
     free(data.list);
+    free(data.memoryList);
 }

@@ -29,11 +29,13 @@ typedef struct datos{
     bool finished;
     int cmdNumber;
 }datos;
+
 struct cmdEntry{
     char *name;
     int(*function)(char *argv[], int argc, datos* data);
     char *ayuda;
 };
+
 extern struct cmdEntry cmdTable[];
 int execute(char* trozos[], int nTrozos, datos* data);
 int cmdAutores(char* opcion[], int nTrozos, datos* data);

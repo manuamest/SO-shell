@@ -27,7 +27,7 @@ void insertItem(tItemL d, tList *L) {
     if (createNode(&q)){
         q->data = d;
         q->next = LNULL;
-        if(*L == LNULL) {                   // TODO: esto vale para el nodo cabeza? no debería ser isEmptyList ya que la lista vacía ya tiene algo?
+        if(*L == LNULL) {
             *L = q;
         } else {
             for (r = *L; r->next != LNULL; r = r->next);

@@ -11,7 +11,7 @@ typedef struct tItemL {
     int number;
     tCommand command;
     void* blockAddress;
-    int blockSize;
+    size_t blockSize;
     struct tm allocTime;
     int allocType;          // 1 = malloc, 2 = shared, 3 = mapped
     int keySh;

@@ -617,22 +617,140 @@ void list_Allocations(int type, tList memList) {
                         case 10: month = "Nov"; break;
                         case 11: month = "Dec"; break;
                     }
-
                     if(i->data.allocType == 1) listType = "malloc";
                     else if(i->data.allocType == 2) listType = "shared";
                     else if(i->data.allocType == 3) listType = "mmap";
 
-                    printf("      %-29p %d %3s %2d %2d:%2d %s\n", i->data.blockAddress, i->data.blockSize, month,
-                           i->data.allocTime.tm_mday, i->data.allocTime.tm_hour, i->data.allocTime.tm_min, listType);
+                    printf("      %-25p %4zu %3s %2d %02d:%02d", i->data.blockAddress, i->data.blockSize, month,
+                           i->data.allocTime.tm_mday, i->data.allocTime.tm_hour, i->data.allocTime.tm_min);
+
+                    if(i->data.allocType == 1) printf(" malloc");
+                    else if(i->data.allocType == 2) printf(" shared (key %d)", i->data.keySh);
+                    else if(i->data.allocType == 3) printf(" %s  (descriptor %d)", i->data.fileName, i->data.fileDescriptor);
+                    printf("\n");
                 }
             }
         }
     }
-    else {
+    else
         printf("uso: allocate [-malloc|-shared|-createshared|-mmap] ....\n");
+}
+
+void allocate_malloc(datos* data, size_t tam) {
+    void* dir = malloc(tam);
+    if(dir == NULL)
+        printf("No queda suficiente espacio para reservar tanta memoria.\n");
+    else {
+        time_t t = time(NULL);              // creamos el nuevo item y lo metemos en la lista
+        tItemL item;
+        item.blockAddress = dir;
+        item.blockSize = tam;
+        item.allocTime = *localtime(&t);
+        item.allocType = 1;     // == malloc
+        insertItem(item, &data->memoryList);
+        printf("Asignados %zu bytes en %p\n", tam, dir);
+    }
+}
+
+void insertarNodoShared (tList* L, void* dir, size_t tam, key_t cl) {
+    time_t t = time(NULL);
+    tItemL item;
+    item.blockAddress = dir;
+    item.blockSize = tam;
+    item.keySh = cl;
+    item.allocTime = *localtime(&t);
+    item.allocType = 2;     // == shared
+    insertItem(item, L);
+}
+
+void* ObtenerMemoriaShmget (key_t clave, size_t tam, datos* data) {
+    void* p;
+    int aux, id, flags = 0777;
+    struct shmid_ds s;
+
+    if(tam != 0)     /* tam distito de 0 indica crear */
+        flags = flags | IPC_CREAT | IPC_EXCL;
+
+    if(clave == IPC_PRIVATE){  /*no nos vale*/
+        errno = EINVAL;
+        return NULL;
     }
 
+    if((id = shmget(clave, tam, flags)) == -1)
+        return NULL;
 
+    if((p = shmat(id,NULL,0)) == (void*) -1){
+        aux = errno;
+        if(tam != 0)
+            shmctl(id,IPC_RMID,NULL);
+        errno = aux;
+        return NULL;
+    }
+    shmctl (id,IPC_STAT,&s);
+    insertarNodoShared (&data->memoryList, p, s.shm_segsz, clave);
+
+    return (p);
+}
+
+void allocate_createshared(char* opcion[], datos* data) {
+    key_t cl;
+    size_t tam;
+    void* p;
+
+    cl = (key_t) strtoul(opcion[1],NULL,10);
+    tam = (size_t) strtoul(opcion[2],NULL,10);
+    if (tam == 0) {
+        printf("No se asignan bloques de 0 bytes\n");
+        return;
+    }
+    if ((p = ObtenerMemoriaShmget(cl,tam, data))!=NULL)
+        printf ("Asignados %zu bytes en %p\n", tam, p);
+    else
+        printf ("Imposible asignar memoria compartida clave %d: %s\n", cl,strerror(errno));
+}
+
+void insertarNodoMmap (tList* L, void* dir, size_t tam, int df, char* fichero) {
+    time_t t = time(NULL);
+    tItemL item;
+    item.blockAddress = dir;
+    item.blockSize = tam;
+    item.fileDescriptor = df;
+    strcpy(item.fileName, fichero);
+    item.allocTime = *localtime(&t);
+    item.allocType = 3;     // == mmap
+    insertItem(item, L);
+}
+
+void* MapearFichero (char* fichero, int protection, datos* data) {
+    int df, map = MAP_PRIVATE, modo = O_RDONLY;
+    struct stat s;
+    void *p;
+
+    if (protection&PROT_WRITE)
+        modo = O_RDWR;
+    if (stat(fichero,&s) == -1 || (df = open(fichero, modo)) == -1)
+        return NULL;
+    if ((p = mmap(NULL,s.st_size, protection,map,df,0)) == MAP_FAILED)
+        return NULL;
+    insertarNodoMmap (&data->memoryList,p, s.st_size,df,fichero);
+
+    return p;
+}
+
+void do_AllocateMmap(char *arg[], datos* data) {
+    char *perm;
+    void *p;
+    int protection = 0;
+
+    if ((perm = arg[1]) != NULL && strlen(perm) < 4) {
+        if (strchr(perm,'r')!=NULL) protection|=PROT_READ;
+        if (strchr(perm,'w')!=NULL) protection|=PROT_WRITE;
+        if (strchr(perm,'x')!=NULL) protection|=PROT_EXEC;
+    }
+    if ((p = MapearFichero(arg[0], protection, data)) == NULL)
+        perror ("Imposible mapear fichero");
+    else
+        printf ("fichero %s mapeado en %p\n", arg[0], p);
 }
 
 int cmdAllocate(char* opcion[], int nTrozos, datos* data) {
@@ -640,41 +758,44 @@ int cmdAllocate(char* opcion[], int nTrozos, datos* data) {
         list_Allocations(0, data->memoryList);
     else{
         if(strcmp(opcion[0], "-malloc") == 0) {
-            if(nTrozos == 2)
+            if(nTrozos != 3)
                 list_Allocations(1, data->memoryList);
             else {
-                int tam = strtol(opcion[1], NULL, 10);
+                // funcion malloc
+                size_t tam = strtol(opcion[1], NULL, 10);
                 if(tam == 0)
                     printf("No se asignan bloques de 0 bytes\n");
-                else {
-                    void* dir = malloc(tam);
-                    if(dir == NULL)
-                        printf("No queda suficiente espacio para reservar tanta memoria.\n");
-                    else {
-                        time_t t = time(NULL);              // creamos el nuevo item y lo metemos en la lista
-                        tItemL item;
-                        item.blockAddress = dir;
-                        item.blockSize = tam;
-                        item.allocTime = *localtime(&t);
-                        item.allocType = 1;     // == malloc
-                        insertItem(item, &data->memoryList);
-                        printf("Asignados %d bytes en %p\n", tam, dir);
-                    }
-                }
+                else
+                    allocate_malloc(data, tam);
+            }
+        }
+        else if(strcmp(opcion[0], "-createshared") == 0) {
+            if(nTrozos != 4)
+                list_Allocations(2, data->memoryList);
+            else {
+                // función createshared
+                allocate_createshared(opcion, data);
             }
         }
         else if(strcmp(opcion[0], "-shared") == 0) {
-            if(nTrozos == 2)
+            if(nTrozos != 3)
                 list_Allocations(2, data->memoryList);
             else {
                 // función shared
+                void* p;
+                key_t cl = (key_t) strtoul(opcion[1],NULL,10);
+                if ((p = ObtenerMemoriaShmget(cl, 0, data)) != NULL)
+                    printf ("Memoria compartida de clave %d en %p\n", cl, p);
+                else
+                    printf ("Imposible asignar memoria compartida clave %d: %s\n", cl, strerror(errno));
             }
         }
         else if(strcmp(opcion[0], "-mmap") == 0) {
-            if(nTrozos == 2)
+            if(nTrozos != 4 && nTrozos != 3)
                 list_Allocations(3, data->memoryList);
             else {
                 // función mmap
+                do_AllocateMmap(&opcion[1], data);
             }
         }
         else
@@ -684,27 +805,43 @@ int cmdAllocate(char* opcion[], int nTrozos, datos* data) {
     return 1;
 }
 
+void do_DeallocateDelkey (char *args[]) {
+    key_t clave;
+    int id;
+    char* key = args[0];
+
+    if (key == NULL || (clave = (key_t) strtoul(key, NULL, 10)) == IPC_PRIVATE){
+        printf("      delkey necesita clave_valida\n");
+        return;
+    }
+    if ((id = shmget(clave, 0, 0666)) == -1){
+        perror("shmget: imposible obtener memoria compartida");
+        return;
+    }
+    if (shmctl(id, IPC_RMID, NULL) == -1)
+        perror("shmctl: imposible eliminar memoria compartida");
+}
+
 int cmdDeallocate(char* opcion[], int nTrozos, datos* data) {
     if(nTrozos == 1)
         list_Allocations(0, data->memoryList);
     else {
         if (strcmp(opcion[0], "-malloc") == 0) {
             //funcion malloc
-            if (nTrozos == 2)
+            if (nTrozos != 3)
                 list_Allocations(1, data->memoryList);
             else {
-                char* ptr;
-                long tam = strtol(opcion[1], &ptr, 10);
+                long tam = strtol(opcion[1], NULL, 10);
                 if(tam == 0)
                     printf("No se asignan bloques de 0 bytes\n");
                 else {
-                    tPosL i;
                     if(!isEmptyList(data->memoryList)) {
+                        tPosL i;
                         for(i = first(data->memoryList); i->next != NULL && getItem(i, data->memoryList).blockSize != tam; i = i->next);
                         if(getItem(i, data->memoryList).blockSize == tam) {
                             tItemL item = getItem(i, data->memoryList);
-                            deleteAtPosition(i, &data->memoryList);     // eliminamos el item de la lista y hacemos free de la dir de mem
                             free(item.blockAddress);
+                            deleteAtPosition(i, &data->memoryList);
                         }
                         else
                             printf("No hay bloque de ese tamano asignado con malloc\n");
@@ -715,35 +852,94 @@ int cmdDeallocate(char* opcion[], int nTrozos, datos* data) {
             }
         }
         else if (strcmp(opcion[0], "-shared") == 0) {
-            if (nTrozos == 2)
+            // función shared
+            if (nTrozos != 3)
                 list_Allocations(2, data->memoryList);
             else {
-                // función shared
+                key_t cl = (key_t) strtoul(opcion[1], NULL, 10);
+                if(!isEmptyList(data->memoryList)) {
+                    tPosL i;
+                    for(i = first(data->memoryList); i->next != NULL && getItem(i, data->memoryList).keySh != cl; i = i->next);
+                    if(getItem(i, data->memoryList).keySh == cl) {
+                        tItemL item = getItem(i, data->memoryList);
+                        if(shmdt(item.blockAddress) == -1)
+                            printf("Error al desmapear la memoria: %s", strerror(errno));
+                        else {
+                            shmctl((int) item.blockAddress, IPC_RMID, NULL);
+                            deleteAtPosition(i, &data->memoryList);
+                        }
+                    }
+                    else
+                        printf("No hay bloque de esa clave mapeado en el proceso\n");
+                }
+                else
+                    printf("No hay bloque de esa clave mapeado en el proceso\n");
+            }
+        }
+        else if (strcmp(opcion[0], "-delkey") == 0) {
+            if (nTrozos != 3)
+                list_Allocations(2, data->memoryList);
+            else {
+                // función delkey
+                do_DeallocateDelkey(&opcion[1]);
             }
         }
         else if (strcmp(opcion[0], "-mmap") == 0) {
-            if (nTrozos == 2)
+            if (nTrozos != 3)
                 list_Allocations(3, data->memoryList);
             else {
                 // función mmap
+                if(!isEmptyList(data->memoryList)) {
+                    tPosL i;
+                    for(i = first(data->memoryList); i->next != NULL && strcmp(getItem(i, data->memoryList).fileName, opcion[1]) != 0; i = i->next);
+                    if(strcmp(getItem(i, data->memoryList).fileName, opcion[1]) == 0) {
+                        tItemL item = getItem(i, data->memoryList);
+                        if(munmap(item.blockAddress, item.blockSize) == -1)
+                            printf("%s", strerror(errno));
+                        else
+                            deleteAtPosition(i, &data->memoryList);
+                    }
+                    else
+                        printf("Fichero %s no mapeado\n", opcion[1]);
+                }
+                else
+                    printf("Fichero %s no mapeado\n", opcion[1]);
             }
         }
         else {
             //función addr
-            // TODO: no funciona
             tPosL i;
-            void* ptr;
-            sscanf(opcion[1], "%p", &ptr);
-            for(i = first(data->memoryList); i != NULL && getItem(i, data->memoryList).blockAddress != ptr; i = i->next);
+            unsigned long dir = strtoul(opcion[0], NULL, 16);
+            for(i = first(data->memoryList); i != NULL && (long) getItem(i, data->memoryList).blockAddress != dir; i = i->next);
             if(i != NULL) {
-                free(ptr);
-                deleteAtPosition(i, &data->memoryList);
+                tItemL item = getItem(i, data->memoryList);
+                if(item.allocType == 1) {
+                    free(i->data.blockAddress);
+                    deleteAtPosition(i, &data->memoryList);
+                }
+                else if(item.allocType == 2) {
+                    if(shmdt(item.blockAddress) == -1)
+                        printf("Error al desmapear la memoria: %s\n", strerror(errno));
+                    else {
+                        if (shmctl((int) item.blockAddress, IPC_RMID, NULL) == -1)
+                            printf("Error al liberar la memoria: %s\n", strerror(errno));
+                        else
+                            deleteAtPosition(i, &data->memoryList);
+                    }
+                }
+                else {
+                    if(munmap(item.blockAddress, item.blockSize) == -1)
+                        printf("%s", strerror(errno));
+                    else
+                        deleteAtPosition(i, &data->memoryList);
+                }
             }
             else printf("Direccion %p no asignada con malloc, shared o mmap", opcion[1]);
         }
     }
     return 1;
 }
+
 //----------------------------------------------||I-O||--------------------------------------
 ssize_t LeerFichero (char *f, void *p, size_t cont)
 {
