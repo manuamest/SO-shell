@@ -980,10 +980,9 @@ ssize_t LeerFichero (char *f, void *p, size_t cont)
     return n;
 }
 
-char** cadtop(char* addr[]) {
-    char* ptr;
-    addr = strtoul(addr, &ptr, 16);
-    return addr;
+void* cadtop(char* addr) {
+    void* p = (void *) strtoul(addr, NULL, 16);
+    return p;
 }
 
 void do_I_O_read (char *ar[])
@@ -1021,7 +1020,6 @@ ssize_t EscribirFichero (char *fich, void *p, ssize_t n){
 }
 int cmdio(char* opcion[], int nTrozos, datos* data) {
     if (opcion[0] != NULL) {
-        char *ptr;
         if (opcion[1] == NULL) {
             printf("faltan parametros\n");
             return -1;
@@ -1039,22 +1037,22 @@ int cmdio(char* opcion[], int nTrozos, datos* data) {
                 return -1;
             }
             void *p;
-            int cont = ((ssize_t) -1);
+            ssize_t cont = -1;
             ssize_t n;
             p = cadtop(opcion[2]);  /*convertimos de cadena a puntero*/
             if (opcion[3] != NULL)
-                cont = (ssize_t) atoll(opcion[3]);
+                cont = atol(opcion[3]);
             if ((strcmp(opcion[1], "-o") == 0)) {
                 if (opcion[2] == NULL || opcion[3] == NULL) {
                     printf("faltan parametros\n");
                     return 0;
                 }
                 creat(opcion[2], 0666);
-                long addr = strtoul(opcion[3],&ptr,16);
-                if((n = EscribirFichero(opcion[2], (long *)addr, atoi(opcion[4])))==-1)
+                void* addr = (void *) strtoul(opcion[3], NULL, 16);
+                if((n = EscribirFichero(opcion[2], addr, atol(opcion[4])))==-1)
                     perror("error de escritura");
                 else
-                    printf("escritos %lld bytes\n", (long long) n);
+                    printf("escritos %zd bytes\n", n);
             } else if (open(opcion[1], O_CREAT | O_EXCL, 0666) != -1) {
                 if ((n = EscribirFichero(opcion[1], p, cont)) == -1)
                     perror("error de escritura");
@@ -1070,10 +1068,9 @@ int cmdio(char* opcion[], int nTrozos, datos* data) {
 
 int cmdMemdump(char* opcion[], int nTrozos, datos* data){
     if(opcion[0] != NULL){
-        char *ptr;
         int cont = 25;
         if (opcion[1]!=NULL) cont = atoi(opcion[1]);
-        long addr = strtoul(opcion[0],&ptr,16);
+        long addr = strtoul(opcion[0],NULL,16);
 
         for(int i=0; i < cont; i+=25){
             long aux = addr;
