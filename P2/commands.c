@@ -1150,7 +1150,7 @@ int cmdMemory(char* opcion[], int nTrozos, datos* data){
                 static int a=0,b=0,c=0;
                 printf("Variables locales:\t\t%p, \t%p, \t%p\n", &x, &y, &z);
                 printf("Variables globales:\t\t%p, \t%p, \t%p\n", &g1, &g2, &g3);
-                printf("Variables estaticas:\t\t%p, \t%p, \t%p\n", &a, &b, &c);
+                printf("Variables estaticas:\t%p, \t%p, \t%p\n", &a, &b, &c);
             }if(strcmp(opcion[i], "-funcs")== 0){
                 printf("Funciones programa:\t\t%p, \t%p, \t%p\n", cmdAutores, cmdFecha, cmdCarpeta);
                 printf("Funciones libreria:\t\t%p, \t%p, \t%p\n", printf, scanf, strtoul);
