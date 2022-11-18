@@ -177,29 +177,29 @@ list.c.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PRACTICASSO.dir/build.make CMakeFiles/PRACTICASSO.dir/list.c.s
 .PHONY : list.c.s
 
-p1.o: p1.c.o
-.PHONY : p1.o
+p2.o: p2.c.o
+.PHONY : p2.o
 
 # target to build an object file
-p1.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PRACTICASSO.dir/build.make CMakeFiles/PRACTICASSO.dir/p1.c.o
-.PHONY : p1.c.o
+p2.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PRACTICASSO.dir/build.make CMakeFiles/PRACTICASSO.dir/p2.c.o
+.PHONY : p2.c.o
 
-p1.i: p1.c.i
-.PHONY : p1.i
+p2.i: p2.c.i
+.PHONY : p2.i
 
 # target to preprocess a source file
-p1.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PRACTICASSO.dir/build.make CMakeFiles/PRACTICASSO.dir/p1.c.i
-.PHONY : p1.c.i
+p2.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PRACTICASSO.dir/build.make CMakeFiles/PRACTICASSO.dir/p2.c.i
+.PHONY : p2.c.i
 
-p1.s: p1.c.s
-.PHONY : p1.s
+p2.s: p2.c.s
+.PHONY : p2.s
 
 # target to generate assembly for a file
-p1.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PRACTICASSO.dir/build.make CMakeFiles/PRACTICASSO.dir/p1.c.s
-.PHONY : p1.c.s
+p2.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PRACTICASSO.dir/build.make CMakeFiles/PRACTICASSO.dir/p2.c.s
+.PHONY : p2.c.s
 
 # Help Target
 help:
@@ -216,9 +216,9 @@ help:
 	@echo "... list.o"
 	@echo "... list.i"
 	@echo "... list.s"
-	@echo "... p1.o"
-	@echo "... p1.i"
-	@echo "... p1.s"
+	@echo "... p2.o"
+	@echo "... p2.i"
+	@echo "... p2.s"
 .PHONY : help
 
 

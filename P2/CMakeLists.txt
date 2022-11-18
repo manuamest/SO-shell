@@ -3,4 +3,4 @@ project(PRACTICASSO C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(PRACTICASSO p1.c commands.c commands.h list.c list.h)
+add_executable(PRACTICASSO p2.c commands.c commands.h list.c list.h)

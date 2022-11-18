@@ -69,19 +69,19 @@ include CMakeFiles/PRACTICASSO.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/PRACTICASSO.dir/flags.make
 
-CMakeFiles/PRACTICASSO.dir/p1.c.o: CMakeFiles/PRACTICASSO.dir/flags.make
-CMakeFiles/PRACTICASSO.dir/p1.c.o: ../p1.c
-CMakeFiles/PRACTICASSO.dir/p1.c.o: CMakeFiles/PRACTICASSO.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/PRACTICASSO.dir/p1.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/PRACTICASSO.dir/p1.c.o -MF CMakeFiles/PRACTICASSO.dir/p1.c.o.d -o CMakeFiles/PRACTICASSO.dir/p1.c.o -c /home/deck/Desktop/UNI/SO/So/P2/p1.c
+CMakeFiles/PRACTICASSO.dir/p2.c.o: CMakeFiles/PRACTICASSO.dir/flags.make
+CMakeFiles/PRACTICASSO.dir/p2.c.o: ../p2.c
+CMakeFiles/PRACTICASSO.dir/p2.c.o: CMakeFiles/PRACTICASSO.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/PRACTICASSO.dir/p2.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/PRACTICASSO.dir/p2.c.o -MF CMakeFiles/PRACTICASSO.dir/p2.c.o.d -o CMakeFiles/PRACTICASSO.dir/p2.c.o -c /home/deck/Desktop/UNI/SO/So/P2/p2.c
 
-CMakeFiles/PRACTICASSO.dir/p1.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PRACTICASSO.dir/p1.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/deck/Desktop/UNI/SO/So/P2/p1.c > CMakeFiles/PRACTICASSO.dir/p1.c.i
+CMakeFiles/PRACTICASSO.dir/p2.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PRACTICASSO.dir/p2.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/deck/Desktop/UNI/SO/So/P2/p2.c > CMakeFiles/PRACTICASSO.dir/p2.c.i
 
-CMakeFiles/PRACTICASSO.dir/p1.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PRACTICASSO.dir/p1.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/deck/Desktop/UNI/SO/So/P2/p1.c -o CMakeFiles/PRACTICASSO.dir/p1.c.s
+CMakeFiles/PRACTICASSO.dir/p2.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PRACTICASSO.dir/p2.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/deck/Desktop/UNI/SO/So/P2/p2.c -o CMakeFiles/PRACTICASSO.dir/p2.c.s
 
 CMakeFiles/PRACTICASSO.dir/commands.c.o: CMakeFiles/PRACTICASSO.dir/flags.make
 CMakeFiles/PRACTICASSO.dir/commands.c.o: ../commands.c
@@ -113,14 +113,14 @@ CMakeFiles/PRACTICASSO.dir/list.c.s: cmake_force
 
 # Object files for target PRACTICASSO
 PRACTICASSO_OBJECTS = \
-"CMakeFiles/PRACTICASSO.dir/p1.c.o" \
+"CMakeFiles/PRACTICASSO.dir/p2.c.o" \
 "CMakeFiles/PRACTICASSO.dir/commands.c.o" \
 "CMakeFiles/PRACTICASSO.dir/list.c.o"
 
 # External object files for target PRACTICASSO
 PRACTICASSO_EXTERNAL_OBJECTS =
 
-PRACTICASSO: CMakeFiles/PRACTICASSO.dir/p1.c.o
+PRACTICASSO: CMakeFiles/PRACTICASSO.dir/p2.c.o
 PRACTICASSO: CMakeFiles/PRACTICASSO.dir/commands.c.o
 PRACTICASSO: CMakeFiles/PRACTICASSO.dir/list.c.o
 PRACTICASSO: CMakeFiles/PRACTICASSO.dir/build.make

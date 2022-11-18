@@ -3,8 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/PRACTICASSO.dir/commands.c.o.d"
   "CMakeFiles/PRACTICASSO.dir/list.c.o"
   "CMakeFiles/PRACTICASSO.dir/list.c.o.d"
-  "CMakeFiles/PRACTICASSO.dir/p1.c.o"
-  "CMakeFiles/PRACTICASSO.dir/p1.c.o.d"
+  "CMakeFiles/PRACTICASSO.dir/p2.c.o"
+  "CMakeFiles/PRACTICASSO.dir/p2.c.o.d"
   "PRACTICASSO"
   "PRACTICASSO.pdb"
 )

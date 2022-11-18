@@ -980,9 +980,10 @@ ssize_t LeerFichero (char *f, void *p, size_t cont)
     return n;
 }
 
-long cadtop(char* addr[]) {
+char** cadtop(char* addr[]) {
     char* ptr;
     addr = strtoul(addr, &ptr, 16);
+    return addr;
 }
 
 void do_I_O_read (char *ar[])
@@ -1002,7 +1003,7 @@ void do_I_O_read (char *ar[])
     if ((n=LeerFichero(ar[1],p,cont))==-1)
         perror ("Imposible leer fichero");
     else
-        printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[0],p);
+        printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[1],p);
 }
 
 ssize_t EscribirFichero (char *fich, void *p, ssize_t n){
@@ -1018,51 +1019,52 @@ ssize_t EscribirFichero (char *fich, void *p, ssize_t n){
     close (df);
     return (nescritos);
 }
-int cmdio(char* opcion[], int nTrozos, datos* data){
-    if(opcion[0] != NULL){
+int cmdio(char* opcion[], int nTrozos, datos* data) {
+    if (opcion[0] != NULL) {
         char *ptr;
-        if(opcion[1] == NULL) {
+        if (opcion[1] == NULL) {
             printf("faltan parametros\n");
             return -1;
         }
-        if(strcmp(opcion[0], "read")== 0){
-            if(nTrozos >= 4){
+        if (strcmp(opcion[0], "read") == 0) {
+            if (nTrozos >= 4) {
                 do_I_O_read(opcion);
             } else {
                 printf("faltan parametros\n");
                 return -1;
             }
-        }else if(strcmp(opcion[0], "write")== 0){
-            if(nTrozos <= 4) {
+        } else if (strcmp(opcion[0], "write") == 0) {
+            if (nTrozos <= 4) {
                 printf("faltan parametros\n");
                 return -1;
             }
             void *p;
-            int cont = ((ssize_t)-1);
+            int cont = ((ssize_t) -1);
             ssize_t n;
-            p=cadtop(opcion[2]);  /*convertimos de cadena a puntero*/
-            if (opcion[3]!=NULL)
-                cont=(ssize_t) atoll(opcion[3]);
-            if((strcmp(opcion[1], "-o")==0)){
-                if (opcion[2]==NULL || opcion[3]==NULL){
-                    printf ("faltan parametros\n");
+            p = cadtop(opcion[2]);  /*convertimos de cadena a puntero*/
+            if (opcion[3] != NULL)
+                cont = (ssize_t) atoll(opcion[3]);
+            if ((strcmp(opcion[1], "-o") == 0)) {
+                if (opcion[2] == NULL || opcion[3] == NULL) {
+                    printf("faltan parametros\n");
                     return 0;
                 }
-                creat(opcion[2], 0777);
-                if((n = EscribirFichero(opcion[2], p, cont)) == -1)
+                creat(opcion[2], 0666);
+                long addr = strtoul(opcion[3],&ptr,16);
+                if((n = EscribirFichero(opcion[2], (long *)addr, atoi(opcion[4])))==-1)
                     perror("error de escritura");
                 else
                     printf("escritos %lld bytes\n", (long long) n);
-            }else if(open(opcion[1],O_RDWR)==-1){
-                creat(opcion[1], 0666);
-                if((n = EscribirFichero(opcion[1], p, cont)) == -1)
+            } else if (open(opcion[1], O_CREAT | O_EXCL, 0666) != -1) {
+                if ((n = EscribirFichero(opcion[1], p, cont)) == -1)
                     perror("error de escritura");
                 else
                     printf("escritos %lld bytes\n", (long long) n);
+            } else {
+                printf("Imposible escribir fichero: %s\n", strerror(errno));
             }
         }
-    }
-    else printf("uso: e-s [read|write] ......\n");
+    }else printf("uso: i-o [read|write] ......\n");
     return 0;
 }
 

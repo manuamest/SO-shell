@@ -10,7 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/deck/Desktop/UNI/SO/So/P2/commands.c" "CMakeFiles/PRACTICASSO.dir/commands.c.o" "gcc" "CMakeFiles/PRACTICASSO.dir/commands.c.o.d"
   "/home/deck/Desktop/UNI/SO/So/P2/list.c" "CMakeFiles/PRACTICASSO.dir/list.c.o" "gcc" "CMakeFiles/PRACTICASSO.dir/list.c.o.d"
-  "/home/deck/Desktop/UNI/SO/So/P2/p1.c" "CMakeFiles/PRACTICASSO.dir/p1.c.o" "gcc" "CMakeFiles/PRACTICASSO.dir/p1.c.o.d"
+  "/home/deck/Desktop/UNI/SO/So/P2/p2.c" "CMakeFiles/PRACTICASSO.dir/p2.c.o" "gcc" "CMakeFiles/PRACTICASSO.dir/p2.c.o.d"
   )
 
 # Targets to which this target links.
