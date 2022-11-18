@@ -8,90 +8,90 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug"/>
+				<Option working_dir="/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="PRACTICASSO">
-				<Option output="/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/PRACTICASSO" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug"/>
+				<Option output="/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/PRACTICASSO" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/11.3.0/include"/>
-					<Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/11.3.0/include-fixed"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 PRACTICASSO"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 PRACTICASSO"/>
+					<CompileFile command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="PRACTICASSO/fast">
-				<Option output="/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/PRACTICASSO" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug"/>
+				<Option output="/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/PRACTICASSO" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/11.3.0/include"/>
-					<Add directory="/usr/lib/gcc/x86_64-unknown-linux-gnu/11.3.0/include-fixed"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
 					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 PRACTICASSO/fast"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 PRACTICASSO/fast"/>
+					<CompileFile command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug"/>
+				<Option working_dir="/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug"/>
+				<Option working_dir="/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j12 -f &quot;/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/deck/Desktop/UNI/SO/So/P2/commands.c">
+		<Unit filename="/home/lucia/Escritorio/SO/gitSO/P2/commands.c">
 			<Option target="PRACTICASSO"/>
 		</Unit>
-		<Unit filename="/home/deck/Desktop/UNI/SO/So/P2/commands.h">
+		<Unit filename="/home/lucia/Escritorio/SO/gitSO/P2/commands.h">
 			<Option target="PRACTICASSO"/>
 		</Unit>
-		<Unit filename="/home/deck/Desktop/UNI/SO/So/P2/list.c">
+		<Unit filename="/home/lucia/Escritorio/SO/gitSO/P2/list.c">
 			<Option target="PRACTICASSO"/>
 		</Unit>
-		<Unit filename="/home/deck/Desktop/UNI/SO/So/P2/list.h">
+		<Unit filename="/home/lucia/Escritorio/SO/gitSO/P2/list.h">
 			<Option target="PRACTICASSO"/>
 		</Unit>
-		<Unit filename="/home/deck/Desktop/UNI/SO/So/P2/p2.c">
+		<Unit filename="/home/lucia/Escritorio/SO/gitSO/P2/p2.c">
 			<Option target="PRACTICASSO"/>
 		</Unit>
-		<Unit filename="/home/deck/Desktop/UNI/SO/So/P2/CMakeLists.txt">
+		<Unit filename="/home/lucia/Escritorio/SO/gitSO/P2/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>

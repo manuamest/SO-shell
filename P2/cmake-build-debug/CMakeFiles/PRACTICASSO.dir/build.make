@@ -44,19 +44,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /app/extra/clion/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /home/lucia/Escritorio/clion-2022.2.3/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /app/extra/clion/bin/cmake/linux/bin/cmake -E rm -f
+RM = /home/lucia/Escritorio/clion-2022.2.3/bin/cmake/linux/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/deck/Desktop/UNI/SO/So/P2
+CMAKE_SOURCE_DIR = /home/lucia/Escritorio/SO/gitSO/P2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug
+CMAKE_BINARY_DIR = /home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/PRACTICASSO.dir/depend.make
@@ -72,44 +72,44 @@ include CMakeFiles/PRACTICASSO.dir/flags.make
 CMakeFiles/PRACTICASSO.dir/p2.c.o: CMakeFiles/PRACTICASSO.dir/flags.make
 CMakeFiles/PRACTICASSO.dir/p2.c.o: ../p2.c
 CMakeFiles/PRACTICASSO.dir/p2.c.o: CMakeFiles/PRACTICASSO.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/PRACTICASSO.dir/p2.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/PRACTICASSO.dir/p2.c.o -MF CMakeFiles/PRACTICASSO.dir/p2.c.o.d -o CMakeFiles/PRACTICASSO.dir/p2.c.o -c /home/deck/Desktop/UNI/SO/So/P2/p2.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/PRACTICASSO.dir/p2.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/PRACTICASSO.dir/p2.c.o -MF CMakeFiles/PRACTICASSO.dir/p2.c.o.d -o CMakeFiles/PRACTICASSO.dir/p2.c.o -c /home/lucia/Escritorio/SO/gitSO/P2/p2.c
 
 CMakeFiles/PRACTICASSO.dir/p2.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PRACTICASSO.dir/p2.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/deck/Desktop/UNI/SO/So/P2/p2.c > CMakeFiles/PRACTICASSO.dir/p2.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/lucia/Escritorio/SO/gitSO/P2/p2.c > CMakeFiles/PRACTICASSO.dir/p2.c.i
 
 CMakeFiles/PRACTICASSO.dir/p2.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PRACTICASSO.dir/p2.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/deck/Desktop/UNI/SO/So/P2/p2.c -o CMakeFiles/PRACTICASSO.dir/p2.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/lucia/Escritorio/SO/gitSO/P2/p2.c -o CMakeFiles/PRACTICASSO.dir/p2.c.s
 
 CMakeFiles/PRACTICASSO.dir/commands.c.o: CMakeFiles/PRACTICASSO.dir/flags.make
 CMakeFiles/PRACTICASSO.dir/commands.c.o: ../commands.c
 CMakeFiles/PRACTICASSO.dir/commands.c.o: CMakeFiles/PRACTICASSO.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/PRACTICASSO.dir/commands.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/PRACTICASSO.dir/commands.c.o -MF CMakeFiles/PRACTICASSO.dir/commands.c.o.d -o CMakeFiles/PRACTICASSO.dir/commands.c.o -c /home/deck/Desktop/UNI/SO/So/P2/commands.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/PRACTICASSO.dir/commands.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/PRACTICASSO.dir/commands.c.o -MF CMakeFiles/PRACTICASSO.dir/commands.c.o.d -o CMakeFiles/PRACTICASSO.dir/commands.c.o -c /home/lucia/Escritorio/SO/gitSO/P2/commands.c
 
 CMakeFiles/PRACTICASSO.dir/commands.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PRACTICASSO.dir/commands.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/deck/Desktop/UNI/SO/So/P2/commands.c > CMakeFiles/PRACTICASSO.dir/commands.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/lucia/Escritorio/SO/gitSO/P2/commands.c > CMakeFiles/PRACTICASSO.dir/commands.c.i
 
 CMakeFiles/PRACTICASSO.dir/commands.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PRACTICASSO.dir/commands.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/deck/Desktop/UNI/SO/So/P2/commands.c -o CMakeFiles/PRACTICASSO.dir/commands.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/lucia/Escritorio/SO/gitSO/P2/commands.c -o CMakeFiles/PRACTICASSO.dir/commands.c.s
 
 CMakeFiles/PRACTICASSO.dir/list.c.o: CMakeFiles/PRACTICASSO.dir/flags.make
 CMakeFiles/PRACTICASSO.dir/list.c.o: ../list.c
 CMakeFiles/PRACTICASSO.dir/list.c.o: CMakeFiles/PRACTICASSO.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/PRACTICASSO.dir/list.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/PRACTICASSO.dir/list.c.o -MF CMakeFiles/PRACTICASSO.dir/list.c.o.d -o CMakeFiles/PRACTICASSO.dir/list.c.o -c /home/deck/Desktop/UNI/SO/So/P2/list.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/PRACTICASSO.dir/list.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/PRACTICASSO.dir/list.c.o -MF CMakeFiles/PRACTICASSO.dir/list.c.o.d -o CMakeFiles/PRACTICASSO.dir/list.c.o -c /home/lucia/Escritorio/SO/gitSO/P2/list.c
 
 CMakeFiles/PRACTICASSO.dir/list.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/PRACTICASSO.dir/list.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/deck/Desktop/UNI/SO/So/P2/list.c > CMakeFiles/PRACTICASSO.dir/list.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/lucia/Escritorio/SO/gitSO/P2/list.c > CMakeFiles/PRACTICASSO.dir/list.c.i
 
 CMakeFiles/PRACTICASSO.dir/list.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/PRACTICASSO.dir/list.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/deck/Desktop/UNI/SO/So/P2/list.c -o CMakeFiles/PRACTICASSO.dir/list.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/lucia/Escritorio/SO/gitSO/P2/list.c -o CMakeFiles/PRACTICASSO.dir/list.c.s
 
 # Object files for target PRACTICASSO
 PRACTICASSO_OBJECTS = \
@@ -125,7 +125,7 @@ PRACTICASSO: CMakeFiles/PRACTICASSO.dir/commands.c.o
 PRACTICASSO: CMakeFiles/PRACTICASSO.dir/list.c.o
 PRACTICASSO: CMakeFiles/PRACTICASSO.dir/build.make
 PRACTICASSO: CMakeFiles/PRACTICASSO.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable PRACTICASSO"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking C executable PRACTICASSO"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/PRACTICASSO.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -137,6 +137,6 @@ CMakeFiles/PRACTICASSO.dir/clean:
 .PHONY : CMakeFiles/PRACTICASSO.dir/clean
 
 CMakeFiles/PRACTICASSO.dir/depend:
-	cd /home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/deck/Desktop/UNI/SO/So/P2 /home/deck/Desktop/UNI/SO/So/P2 /home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug /home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug /home/deck/Desktop/UNI/SO/So/P2/cmake-build-debug/CMakeFiles/PRACTICASSO.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/lucia/Escritorio/SO/gitSO/P2 /home/lucia/Escritorio/SO/gitSO/P2 /home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug /home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug /home/lucia/Escritorio/SO/gitSO/P2/cmake-build-debug/CMakeFiles/PRACTICASSO.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/PRACTICASSO.dir/depend
 

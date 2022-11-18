@@ -1,11 +1,11 @@
-EXE_NAME = p1
+EXE_NAME = p2
 CFLAGS = -Wall -g
 CC = gcc
 
-all: clean shell
+all: clean p2
 
-shell:	commands.o list.o
-	$(CC) $(CFLAGS) -o $(EXE_NAME) p1.c commands.o list.o
+p2:	commands.o list.o
+	$(CC) $(CFLAGS) -o $(EXE_NAME) p2.c commands.o list.o
 
 commands.o:
 	$(CC) $(CFLAGS) -c commands.c
