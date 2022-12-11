@@ -31,10 +31,11 @@ int main() {
     char line[1024];
     char* trozos[128];
     int nTrozos;
-    tList lista, memList;
+    tList lista, memList, processList;
     createEmptyList(&lista);
     createEmptyList(&memList);
-    datos data = { lista, memList, false, 0 };
+    createEmptyList(&processList);
+    datos data = { lista, memList, processList, false, 0 };
 
     while (!data.finished) {
         //prints a promt
@@ -46,6 +47,8 @@ int main() {
     }
     clearOutList(&data.list);
     clearOutList(&data.memoryList);
+    clearOutList(&data.processList);
     free(data.list);
     free(data.memoryList);
+    free(data.processList);
 }

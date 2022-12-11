@@ -203,7 +203,9 @@ int cmdInfosis(char* opcion[], int nTrozos, datos* data){
 int cmdAyuda(char* opcion[], int nTrozos, datos* data){
     if (opcion[0] == NULL) {
         printf("'ayuda cmd' donde cmd es uno de los siguientes comandos:\n"
-               "fin salir bye fecha pid autores hist comando carpeta infosis ayuda \n");
+               "fin salir bye fecha pid autores hist comando carpeta infosis ayuda create stat list"
+               "delete deltree allocate deallocate i-o memdump memfill memory recurse priority showvar"
+               "changevar showenv fork execute listjobs deljobs job\n");
     } else {
         for (int i = 0; i < NCOMMANDS; i++) {
             if (strcmp(opcion[0], cmdTable[i].name) == 0) {

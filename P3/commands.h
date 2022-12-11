@@ -27,6 +27,7 @@
 typedef struct datos{
     tList list;
     tList memoryList;
+    tList processList;
     bool finished;
     int cmdNumber;
 }datos;

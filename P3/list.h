@@ -6,10 +6,12 @@
 #define LNULL NULL
 
 typedef char tCommand[1024];
+enum statusTypes {FINISHED, STOPPED, SIGNALED, ACTIVE};
 
 typedef struct tItemL {
     int number;
     tCommand command;
+
     void* blockAddress;
     size_t blockSize;
     struct tm allocTime;
@@ -17,6 +19,11 @@ typedef struct tItemL {
     int keySh;
     char fileName[100];
     int fileDescriptor;
+
+    int pid;
+    struct tm launchingDate;
+    enum statusTypes status;
+    int priority;
 } tItemL;
 
 typedef struct tNode* tPosL;
