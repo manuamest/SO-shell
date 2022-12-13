@@ -2,6 +2,8 @@
  * Lucia Alvarez Garcia: l.alvarezg@udc.es */
 #include "commands.h"
 
+extern char **environ;
+
 struct cmdEntry cmdTable[] = {
         {"autores", cmdAutores,"uso: autores [-n|-l]\tMuestra los nombres y logins de los autores\n"},
         {"pid", cmdPid, "uso: pid [-p]\tMuestra el pid del shell o de su proceso padre\n"},
@@ -38,30 +40,33 @@ struct cmdEntry cmdTable[] = {
                        "\tread fich addr cont: Lee cont bytes desde fich a addr\n"
                        "\twrite [-o] fich addr cont: Escribe cont bytes desde addr a fich. -o para sobreescribir\n"
                        "\t\taddr es una direccion de memoria"},
-        {"memdump", cmdMemdump, "uso: memdump addr cont \tVuelca en pantallas los contenidos (cont bytes) de la posicion de memoria addr"},
+        {"memdump", cmdMemdump, "uso: memdump addr cont \tVuelca en pantallas los contenidos (cont bytes) de la posicion de memoria addr\n"},
         {"memfill", cmdMemfill, "uso: memfill addr cont byte \tLlena la memoria a partir de addr con byte"},
         {"memory", cmdMemory, "uso: memory [-blocks|-funcs|-vars|-all|-pmap] ..\tMuestra muestra detalles de la memoria del proceso\n"
                               "\t\t-blocks: los bloques de memoria asignados\n"
                               "\t\t-funcs: las direcciones de las funciones\n"
                               "\t\t-vars: las direcciones de las variables\n"
                               "\t\t:-all: todo\n"
-                              "\t\t-pmap: muestra la salida del comando pmap(o similar)"},
-        {"recurse", cmdRecurse, "uso: recurse [n]\tInvoca a la funcion recursiva n veces"},
-        {"priority", cmdPriority, "uso: priority [pid] [valor] \tMuestra o cambia la prioridad del proceso pid a valor"},
-        {"showvar", cmdShowvar, "uso: showvar var1\tMuestra el valor y las direcciones de la variable de entorno var"},
+                              "\t\t-pmap: muestra la salida del comando pmap(o similar)\n"},
+        {"recurse", cmdRecurse, "uso: recurse [n]\tInvoca a la funcion recursiva n veces\n"},
+        {"priority", cmdPriority, "uso: priority [pid] [valor] \tMuestra o cambia la prioridad del proceso pid a valor\n"},
+        {"showvar", cmdShowvar, "uso: showvar var\tMuestra el valor y las direcciones de la variable de entorno var\n"},
         {"changevar", cmdChangevar, "uso: changevar [-a|-e|-p] var valor\tCambia el valor de una variable de entorno\n"
                                     "\t-a: accede por el tercer arg de main\n"
                                     "\t-e: accede mediante environ\n"
-                                    "\t-p: accede mediante putenv"},
-        {"showenv", cmdShowenv, "uso: showenv [-environ|-addr] \t Muestra el entorno del proceso"},
-        {"fork", cmdFork, "uso: fork \tHace una llamada fork para crear un proceso"},
-        {"execute", cmdExecute, "uso: execute prog args....\tEjecuta, sin crear proceso,prog con argumentos"},
-        {"listjobs", cmdListjobs, "uso: listjobs \tLista los procesos en segundo plano"},
+                                    "\t-p: accede mediante putenv\n"},
+        {"showenv", cmdShowenv, "uso: showenv [-environ|-addr] \t Muestra el entorno del proceso\n"
+                                    "\t-environ: accede usando environ (en lugar del tercer arg de main)\n"
+                                    "\t-addr: muestra el valor y donde se almacenan environ y el 3er arg main"},
+        {"fork", cmdFork, "uso: fork \tHace una llamada fork para crear un proceso\n"},
+        {"execute", cmdExecute, "uso: execute VAR1 VAR2...prog args...[@pri]\tEjecuta, sin crear proceso,prog con argumentos\n"
+                                "\ten un entorno que contiene solo las variables VAR1, VAR2..."},
+        {"listjobs", cmdListjobs, "uso: listjobs \tLista los procesos en segundo plano\n"},
         {"deljobs", cmdDeljobs, "uso: deljobs [-term][-sig]\tElimina los procesos de la lista procesos en sp\n"
                                 "\t-term: los terminados\n"
-                                "\t\t-sig: los terminados por senal"},
+                                "\t\t-sig: los terminados por señal\n"},
         {"job", cmdJob, "uso: job [-fg] pid\tMuestra informacion del proceso pid.\n"
-                        "\t\t-fg: lo pasa a primer plano"},
+                        "\t\t-fg: lo pasa a primer plano\n"},
         {NULL, NULL, NULL}
 };
 
@@ -1225,27 +1230,134 @@ int cmdPriority(char* opcion[], int nTrozos, datos* data){
     return 0;
 }
 
+int BuscarVariable (char* var, char *e[]) {  /*busca una variable en el entorno que se le pasa como parámetro*/
+    int pos = 0;
+    char aux[1024];
+
+    strcpy (aux, var);
+    strcat (aux, "=");
+
+    while (e[pos] != NULL)
+        if (!strncmp(e[pos],aux,strlen(aux)))
+            return (pos);
+        else
+            pos++;
+    errno = ENOENT;   /*no hay tal variable*/
+    return(-1);
+}
+
+int CambiarVariable(char* var, char* valor, char *e[]) { /*cambia una variable en el entorno que se le pasa como parámetro*/
+    int pos;
+    char *aux;
+
+    if ((pos=BuscarVariable(var,e)) == -1)      // si no existe la variable...
+        return(-1);
+
+    if ((aux=(char *)malloc(strlen(var)+strlen(valor)+2)) == NULL)  // si no hay espacio...
+        return -1;
+    strcpy(aux, var);
+    strcat(aux, "=");
+    strcat(aux, valor);
+    e[pos] = aux;
+    return (pos);
+}
+
 int cmdShowvar(char* opcion[], int nTrozos, datos* data){
+    if(opcion[0] == NULL) {
+        for (int i=0; data->arg3[i]!=NULL; i++) {
+            printf("%p->main arg3[%d]=(%p) %s\n", &data->arg3[i], i, data->arg3[i], data->arg3[i]);
+        }
+    }
+    else {
+        int pos;
+        if((pos=BuscarVariable(opcion[0], environ)) == -1)
+            return 1;
+        else {
+            printf("Con arg3 main %s(%p) @%p\n", data->arg3[pos], data->arg3[pos], &data->arg3[pos]);
+            printf("  Con environ %s(%p) @%p\n", environ[pos], environ[pos], &environ[pos]);
+            printf("   Con getenv %s(%p)\n", getenv(opcion[0]), getenv(opcion[0]));
+        }
+    }
+
+    return 1;
 }
 
 int cmdChangevar(char* opcion[], int nTrozos, datos* data){
+    if(opcion[0] == NULL || opcion[1] == NULL || opcion[2] == NULL){
+        printf("Uso: changevar [-a|-e|-p] var valor\n");
+        return 1;
+    }
+    else if(strcmp(opcion[0], "-a") == 0 || strcmp(opcion[0], "-e") == 0) {
+        int pos;
+        if((pos = CambiarVariable(opcion[1], opcion[2], data->arg3)) == -1)
+            printf("%s", strerror(errno));
+    }
+    else if(strcmp(opcion[0], "-p") == 0) {
+        char* string;
+
+        if((string = malloc((strlen(opcion[1]) + strlen(opcion[2]) + 2) * sizeof(char))) == NULL)
+            return 1;
+        else {
+            strcpy(string, opcion[1]);
+            strcat(string, "=");
+            strcat(string, opcion[2]);
+
+            if(putenv(string) != 0)
+                printf("%s", strerror(errno));
+        }
+    }
+    else
+        printf("Uso: changevar [-a|-e|-p] var valor\n");
+
+    return 1;
 }
 
 int cmdShowenv(char* opcion[], int nTrozos, datos* data){
+    if(opcion[0] == NULL){                  // por defecto con arg3
+        for (int i=0; data->arg3[i]!=NULL; i++) {
+            printf("%p->main arg3[%d]=(%p) %s\n", &data->arg3[i], i, data->arg3[i], data->arg3[i]);
+        }
+    }
+    else if(strcmp(opcion[0], "-environ") == 0) {   // con environ
+        for (int i=0; environ[i]!=NULL; i++) {
+            printf("%p->environ[%d]=(%p) %s\n", &environ[i], i, environ[i], environ[i]);
+        }
+    }
+    else if(strcmp(opcion[0], "-addr") == 0) {
+        printf("environ:   %p (almacenado en %p)\n"
+               "main arg3: %p (almacenado en %p)\n", &environ[0], &environ, &data->arg3[0], &data->arg3);
+    }
+    return 1;
 }
 
 int cmdFork(char* opcion[], int nTrozos, datos* data){
+    pid_t pid;
+
+    if ((pid = fork()) == 0){
+        clearOutList(&data->processList);
+        printf ("ejecutando proceso %d\n", getpid());
+    }
+    else if (pid == -1)
+        printf("%s", strerror(errno));
+    else
+        waitpid (pid,NULL,0);
+
+    return 1;
 }
 
 int cmdExecute(char* opcion[], int nTrozos, datos* data){
+    return 1;
 }
 
 int cmdListjobs(char* opcion[], int nTrozos, datos* data){
+    return 1;
 }
 
 int cmdDeljobs(char* opcion[], int nTrozos, datos* data){
+    return 1;
 }
 
 int cmdJob(char* opcion[], int nTrozos, datos* data){
+    return 1;
 }
 

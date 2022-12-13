@@ -19,7 +19,6 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/resource.h>
-//#include "ayudaP2.c"
 #ifndef SOP0_COMMANDS_H
 #define SOP0_COMMANDS_H
 #define NCOMMANDS 32
@@ -30,6 +29,7 @@ typedef struct datos{
     tList processList;
     bool finished;
     int cmdNumber;
+    char** arg3;
 }datos;
 
 struct cmdEntry{
@@ -71,4 +71,5 @@ int cmdExecute(char* opcion[], int nTrozos, datos* data);
 int cmdListjobs(char* opcion[], int nTrozos, datos* data);
 int cmdDeljobs(char* opcion[], int nTrozos, datos* data);
 int cmdJob(char* opcion[], int nTrozos, datos* data);
+
 #endif //SOP0_COMMANDS_H

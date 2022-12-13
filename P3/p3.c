@@ -27,7 +27,7 @@ void readEntry(char* line, datos* data) {
     }
 }
 
-int main() {
+int main(int argc, char **argv, char **arg3) {
     char line[1024];
     char* trozos[128];
     int nTrozos;
@@ -35,7 +35,7 @@ int main() {
     createEmptyList(&lista);
     createEmptyList(&memList);
     createEmptyList(&processList);
-    datos data = { lista, memList, processList, false, 0 };
+    datos data = { lista, memList, processList, false, 0, arg3 };
 
     while (!data.finished) {
         //prints a promt

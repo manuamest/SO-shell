@@ -4,7 +4,7 @@ CC = gcc
 
 all: clean p3
 
-p2:	commands.o list.o
+p3:	commands.o list.o
 	$(CC) $(CFLAGS) -o $(EXE_NAME) p3.c commands.o list.o
 
 commands.o:
