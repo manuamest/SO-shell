@@ -79,6 +79,14 @@ int execute(char* trozos[], int nTrozos, datos* data){
                 return cmdTable[i].function(&trozos[1], nTrozos, data);
             }
         }
+        if(strcmp(trozos[nTrozos-1], "&")==0){
+            char *aux[nTrozos+1];
+            for(int i=0;i<nTrozos-1;i++){
+                aux[i] = trozos[i];
+            }
+            //ejecutar en segundo plano
+        }else
+            cmdExecute(trozos, nTrozos, data);
         printf("No ejecutado: No such file or directory\n");
     }
 
@@ -1346,18 +1354,128 @@ int cmdFork(char* opcion[], int nTrozos, datos* data){
 }
 
 int cmdExecute(char* opcion[], int nTrozos, datos* data){
-    return 1;
+    if (opcion[0] != NULL) {
+        if(execvp(opcion[0], &opcion[0]) == -1){
+            printf("No ejecutado: %s\n", strerror(errno));
+            return -1;
+        }
+        printf("ejecutado");
+        int pid = fork();
+        waitpid(pid, NULL, 0);
+        return pid;
+    } else {
+        printf("Imposible ejecutar: Bad address\n");
+    }
+    return -1;
+}
+
+char *NombreSenal(int sen)  /*devuelve el nombre senal a partir de la senal*/
+{			/* para sitios donde no hay sig2str*/
+    int i;
+    for (i=0; sigstrnum[i].nombre!=NULL; i++)
+        if (sen==sigstrnum[i].senal)
+            return sigstrnum[i].nombre;
+    return ("SIGUNKNOWN");
+}
+
+char * NombreUsuario(uid_t user) /*devuelve el nombre de usuario a partir del user*/
+{
+    struct passwd *pw;
+    pw=getpwuid(user);
+    if (pw==NULL)
+        return ("UNKNOWN");
+    else
+        return (pw->pw_name);
 }
 
 int cmdListjobs(char* opcion[], int nTrozos, datos* data){
-    return 1;
+    char time[MAXVAR];
+    char out[MAXVAR];
+    tPosL p;
+    enum statusTypes status;
+    if (isEmptyList(data->processList)) {
+        return 0;
+    }
+    for(p=first(data->processList); !endOfList(p, data->processList); p=next(data->processList, p)) {
+        struct tItemL info = getItem(data->processList, p);
+        status = info.status;
+        if (waitpid(info.pid, &info.out, WNOHANG | WUNTRACED | WCONTINUED) == info.pid){
+            if(WIFEXITED(info.out)){
+                status = FINISHED; info.out = WEXITSTATUS(info.out);
+            }else if(WIFSIGNALED(info.out)){
+                status = SIGNALED; info.out = WTERMSIG(info.out);
+            }else if(WIFSTOPPED(info.out)){
+                status = STOPPED; info.out = WTERMSIG(info.out);
+            }else if(WIFCONTINUED(info.out))
+                status = ACTIVE;
+        }
+        strftime(time, MAXVAR, "%Y/%m/%d %H:%M:%S ",info.launchingDate);
+        if(status == FINISHED || status == ACTIVE){
+            printf("%d %10s p=%d %s %u (%03d) %s\n", info.pid, NombreUsuario(info.user), getpriority(PRIO_PROCESS,info.pid), time, status, info.out, info.command);
+        }
+        else if(status == STOPPED || status == SIGNALED){
+            strcpy(out,NombreSenal(info.out));
+            printf("%d %10s p=%d %s %u (%3s) %s\n", info.pid, NombreUsuario(info.user), getpriority(PRIO_PROCESS,info.pid), time, status, out, info.command);
+        }
+    }
+    return 0;
 }
 
 int cmdDeljobs(char* opcion[], int nTrozos, datos* data){
-    return 1;
+    if(opcion[0] != NULL){
+        bool term = false;
+        bool sig = false;
+        tPosL p;
+        for(int i=0;i<nTrozos;i++){
+            if(strcmp(opcion[i],"-term")==0) term=true;
+            if(strcmp(opcion[i],"-sig")==0) sig=true;
+        }
+        do{
+            for(p=first(data->processList); !endOfList(p, data->processList); p=next(data->processList, p)){
+                struct tItemL info= getItem(p, data->processList);
+                if(WIFEXITED(info.out) && term){
+                    deleteAtPosition(p, &data->processList);
+                    break;
+                }
+                else if(WIFSIGNALED(info.out) && sig){
+                    deleteAtPosition(p, &data->processList);
+                    break;
+                }
+            }
+        }
+        while(!endOfList(p, data->processList));
+    }
+    else
+        cmdListjobs(opcion,nTrozos,data);
+    return 0;
 }
 
 int cmdJob(char* opcion[], int nTrozos, datos* data){
-    return 1;
+    char time[MAXVAR];
+    if(opcion[0] != NULL){
+        for(tPosL p=first(data->processList); !endOfList(p, data->processList); p=next(data->processList, p)){
+            struct tItemL info = getItem(p, data->processList);
+            if(strcmp(opcion[0],"-fg")==0){
+                if(info.pid==atoi(opcion[1])){
+                    waitpid(info.pid,NULL,0);
+                    if(info.status == ACTIVE)
+                        printf("Proceso %d terminado, valor devuelto %d\n" , info.pid, info.out);
+                    else
+                        printf("Proceso %d pid finalizado\n", info.pid);
+                    deleteAtPosition(p, &data->processList);
+                    break;
+                }
+            } else {
+                if(info.pid==atoi(opcion[0])){
+                    strftime(time, MAXVAR, "%Y/%m/%d %H:%M:%S ",info.launchingDate);
+                    printf("%d %12s p=%d %s %u (%03d) %s\n", info.pid, NombreUsuario(info.user),
+                           getpriority(PRIO_PROCESS,info.pid), time, info.status, info.out, info.command);
+                    break;
+                }
+            }
+        }
+    } else
+        cmdListjobs(opcion,nTrozos, data);
+    return 0;
 }
 

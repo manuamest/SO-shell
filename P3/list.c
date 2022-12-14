@@ -37,6 +37,10 @@ void insertItem(tItemL d, tList *L) {
     }
 }
 
+int endOfList(tPosL p, tList L) {
+    return (p->next == LNULL);
+}
+
 void updateItem(tItemL d, tPosL p, tList *L) {
     p->data = d;
 }

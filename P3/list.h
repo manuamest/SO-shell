@@ -19,11 +19,11 @@ typedef struct tItemL {
     int keySh;
     char fileName[100];
     int fileDescriptor;
-
+    int out;
     int pid;
-    struct tm launchingDate;
+    int user;
+    const struct tm *launchingDate;
     enum statusTypes status;
-    int priority;
 } tItemL;
 
 typedef struct tNode* tPosL;
@@ -37,6 +37,12 @@ struct tNode {
 
 typedef tPosL tList;
 
+struct SEN{
+    char *nombre;
+    int senal;
+};
+
+int endOfList(tPosL p, tList L);
 void createEmptyList(tList *L);
 bool createNode(tPosL* p);
 void insertItem(tItemL d, tList *L);
