@@ -223,7 +223,7 @@ int cmdAyuda(char* opcion[], int nTrozos, datos* data){
         for (int i = 0; i < NCOMMANDS; i++) {
             if (strcmp(opcion[0], cmdTable[i].name) == 0) {
                 printf("%s", cmdTable[i].ayuda);
-                break;
+                return 1;
             }
         }
         printf("%s no encontrado\n", opcion[0]);
@@ -1240,7 +1240,7 @@ int cmdPriority(char* opcion[], int nTrozos, datos* data){
 
 int BuscarVariable (char* var, char *e[]) {  /*busca una variable en el entorno que se le pasa como parámetro*/
     int pos = 0;
-    char aux[1024];
+    char aux[(strlen(var) + 2) * sizeof(char)];
 
     strcpy (aux, var);
     strcat (aux, "=");
@@ -1254,7 +1254,7 @@ int BuscarVariable (char* var, char *e[]) {  /*busca una variable en el entorno 
     return(-1);
 }
 
-int CambiarVariable(char* var, char* valor, char *e[]) { /*cambia una variable en el entorno que se le pasa como parámetro*/
+int CambiarVariable(char* var, char* valor, char *e[], datos* data) { /*cambia una variable en el entorno que se le pasa como parámetro*/
     int pos;
     char *aux;
 
@@ -1267,6 +1267,12 @@ int CambiarVariable(char* var, char* valor, char *e[]) { /*cambia una variable e
     strcat(aux, "=");
     strcat(aux, valor);
     e[pos] = aux;
+    /*if(entvar.var[0] == NULL)
+        entvar.var[entvar.lastPos] = aux;
+    else {*/
+    data->entvar.lastPos++;
+    data->entvar.var[data->entvar.lastPos] = aux;
+    //}
     return (pos);
 }
 
@@ -1297,7 +1303,7 @@ int cmdChangevar(char* opcion[], int nTrozos, datos* data){
     }
     else if(strcmp(opcion[0], "-a") == 0 || strcmp(opcion[0], "-e") == 0) {
         int pos;
-        if((pos = CambiarVariable(opcion[1], opcion[2], data->arg3)) == -1)
+        if((pos = CambiarVariable(opcion[1], opcion[2], data->arg3, data)) == -1)
             printf("%s", strerror(errno));
     }
     else if(strcmp(opcion[0], "-p") == 0) {
@@ -1309,10 +1315,12 @@ int cmdChangevar(char* opcion[], int nTrozos, datos* data){
             strcpy(string, opcion[1]);
             strcat(string, "=");
             strcat(string, opcion[2]);
-
             if(putenv(string) != 0)
                 printf("%s", strerror(errno));
         }
+        printf("%p\n", string);
+        data->entvar.lastPos++;
+        data->entvar.var[data->entvar.lastPos] = string;
     }
     else
         printf("Uso: changevar [-a|-e|-p] var valor\n");

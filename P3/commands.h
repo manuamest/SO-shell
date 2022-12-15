@@ -24,6 +24,11 @@
 #define NCOMMANDS 32
 #define MAXVAR 1024
 
+typedef struct entvars {
+    void* var[4096];
+    int lastPos;
+}entvars;
+
 typedef struct datos{
     tList list;
     tList memoryList;
@@ -31,6 +36,7 @@ typedef struct datos{
     bool finished;
     int cmdNumber;
     char** arg3;
+    struct entvars entvar;
 }datos;
 
 struct cmdEntry{
@@ -38,6 +44,8 @@ struct cmdEntry{
     int(*function)(char *argv[], int argc, datos* data);
     char *ayuda;
 };
+
+
 
 
 
