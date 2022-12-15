@@ -2,11 +2,11 @@
  * Lucia Alvarez Garcia: l.alvarezg@udc.es */
 #include <stdbool.h>
 #include <time.h>
+#include <signal.h>
 
 #define LNULL NULL
 
 typedef char tCommand[1024];
-enum statusTypes {FINISHED, STOPPED, SIGNALED, ACTIVE};
 
 typedef struct tItemL {
     int number;
@@ -21,9 +21,9 @@ typedef struct tItemL {
     int fileDescriptor;
     int out;
     int pid;
-    int user;
+    uid_t user;
     const struct tm *launchingDate;
-    enum statusTypes status;
+    char status[20];
 } tItemL;
 
 typedef struct tNode* tPosL;

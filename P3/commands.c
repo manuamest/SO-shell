@@ -56,8 +56,8 @@ struct cmdEntry cmdTable[] = {
                                     "\t-e: accede mediante environ\n"
                                     "\t-p: accede mediante putenv\n"},
         {"showenv", cmdShowenv, "uso: showenv [-environ|-addr] \t Muestra el entorno del proceso\n"
-                                    "\t-environ: accede usando environ (en lugar del tercer arg de main)\n"
-                                    "\t-addr: muestra el valor y donde se almacenan environ y el 3er arg main"},
+                                "\t-environ: accede usando environ (en lugar del tercer arg de main)\n"
+                                "\t-addr: muestra el valor y donde se almacenan environ y el 3er arg main"},
         {"fork", cmdFork, "uso: fork \tHace una llamada fork para crear un proceso\n"},
         {"execute", cmdExecute, "uso: execute VAR1 VAR2...prog args...[@pri]\tEjecuta, sin crear proceso,prog con argumentos\n"
                                 "\ten un entorno que contiene solo las variables VAR1, VAR2..."},
@@ -70,6 +70,147 @@ struct cmdEntry cmdTable[] = {
         {NULL, NULL, NULL}
 };
 
+/*las siguientes funciones nos permiten obtener el nombre de una senal a partir
+del número y viceversa */
+static struct SEN sigstrnum[]={
+        {"HUP", SIGHUP},
+        {"INT", SIGINT},
+        {"QUIT", SIGQUIT},
+        {"ILL", SIGILL},
+        {"TRAP", SIGTRAP},
+        {"ABRT", SIGABRT},
+        {"IOT", SIGIOT},
+        {"BUS", SIGBUS},
+        {"FPE", SIGFPE},
+        {"KILL", SIGKILL},
+        {"USR1", SIGUSR1},
+        {"SEGV", SIGSEGV},
+        {"USR2", SIGUSR2},
+        {"PIPE", SIGPIPE},
+        {"ALRM", SIGALRM},
+        {"TERM", SIGTERM},
+        {"CHLD", SIGCHLD},
+        {"CONT", SIGCONT},
+        {"STOP", SIGSTOP},
+        {"TSTP", SIGTSTP},
+        {"TTIN", SIGTTIN},
+        {"TTOU", SIGTTOU},
+        {"URG", SIGURG},
+        {"XCPU", SIGXCPU},
+        {"XFSZ", SIGXFSZ},
+        {"VTALRM", SIGVTALRM},
+        {"PROF", SIGPROF},
+        {"WINCH", SIGWINCH},
+        {"IO", SIGIO},
+        {"SYS", SIGSYS},
+/*senales que no hay en todas partes*/
+#ifdef SIGPOLL
+        {"POLL", SIGPOLL},
+#endif
+#ifdef SIGPWR
+        {"PWR", SIGPWR},
+#endif
+#ifdef SIGEMT
+        {"EMT", SIGEMT},
+#endif
+#ifdef SIGINFO
+        {"INFO", SIGINFO},
+#endif
+#ifdef SIGSTKFLT
+        {"STKFLT", SIGSTKFLT},
+#endif
+#ifdef SIGCLD
+        {"CLD", SIGCLD},
+#endif
+#ifdef SIGLOST
+        {"LOST", SIGLOST},
+#endif
+#ifdef SIGCANCEL
+        {"CANCEL", SIGCANCEL},
+#endif
+#ifdef SIGTHAW
+        {"THAW", SIGTHAW},
+#endif
+#ifdef SIGFREEZE
+        {"FREEZE", SIGFREEZE},
+#endif
+#ifdef SIGLWP
+        {"LWP", SIGLWP},
+#endif
+#ifdef SIGWAITING
+        {"WAITING", SIGWAITING},
+#endif
+        {NULL,-1},
+};    /*fin array sigstrnum */
+
+int BuscarVariable (char* var, char *e[]) {  /*busca una variable en el entorno que se le pasa como parámetro*/
+    int pos = 0;
+    char aux[1024];
+
+    strcpy (aux, var);
+    strcat (aux, "=");
+
+    while (e[pos] != NULL)
+        if (!strncmp(e[pos],aux,strlen(aux)))
+            return (pos);
+        else
+            pos++;
+    errno = ENOENT;   /*no hay tal variable*/
+    return(-1);
+}
+
+int background (char *argv[], int nTrozos, datos * data) {
+    int pid;
+    int i;
+    time_t t = time(NULL);
+    char *aux[nTrozos + 1];
+    char comando[MAXVAR] = "";
+    for (int j = 0; j < nTrozos; ++j) {
+        strcat(comando, argv[j]);
+        strcat(comando, " ");
+    }
+    for (i=0; i < nTrozos; i++)
+        aux[i] = argv[i];
+    aux[nTrozos] = NULL;
+    if ((pid = fork()) == 0) {
+        execvp(argv[0], aux);
+        perror("Error en execvp");
+        exit(1);
+    } else if (pid < 0) {
+        perror("Error en fork");
+        return(-1);
+    } else {
+        struct tItemL info;
+        strcpy(info.command, comando);
+        info.launchingDate = localtime(&t);
+        info.user = getuid();
+        info.out = 0;
+        info.pid = pid;
+        strcpy(info.status, "ACTIVE");
+        insertItem(info, &data->processList);
+        printf("Proceso %d en segundo plano\n", pid);
+        return(pid);
+    }
+}
+
+int ejecutarComandos (char *argv[], int nTrozos, datos * data) {
+    int i;
+    int pid;
+    int status;
+    char *aux[nTrozos + 1];
+    for (i=0; i < nTrozos; i++)
+        aux[i] = argv[i];
+    aux[nTrozos] = NULL;
+    if ((pid = fork()) == 0) {
+        if (execvp(argv[0], aux) == -1) {
+            perror("Error en execvp");
+            exit(1);
+        }
+    }
+    waitpid(pid, &status, 0);
+    return 1;
+}
+
 int execute(char* trozos[], int nTrozos, datos* data){
     if (trozos[0] == NULL) {
         return 0;
@@ -80,22 +221,21 @@ int execute(char* trozos[], int nTrozos, datos* data){
             }
         }
         if(strcmp(trozos[nTrozos-1], "&")==0){
-            char *aux[nTrozos+1];
-            for(int i=0;i<nTrozos-1;i++){
-                aux[i] = trozos[i];
+            background(trozos, nTrozos-1, data);
+        }else {
+            if (ejecutarComandos(trozos, nTrozos, data) == 1) {
+                return 1;
             }
-            //ejecutar en segundo plano
-        }else
-            cmdExecute(trozos, nTrozos, data);
-        printf("No ejecutado: No such file or directory\n");
+            printf("No ejecutado: No such file or directory\n");
+        }
     }
-
     return 1;
 }
 
 void cmdError(){
     printf("ERROR: comando invalido\n");
 }
+
 
 int cmdAutores(char* opcion[], int nTrozos, datos* data) {
     if (opcion[0] == NULL) {
@@ -1238,22 +1378,6 @@ int cmdPriority(char* opcion[], int nTrozos, datos* data){
     return 0;
 }
 
-int BuscarVariable (char* var, char *e[]) {  /*busca una variable en el entorno que se le pasa como parámetro*/
-    int pos = 0;
-    char aux[(strlen(var) + 2) * sizeof(char)];
-
-    strcpy (aux, var);
-    strcat (aux, "=");
-
-    while (e[pos] != NULL)
-        if (!strncmp(e[pos],aux,strlen(aux)))
-            return (pos);
-        else
-            pos++;
-    errno = ENOENT;   /*no hay tal variable*/
-    return(-1);
-}
-
 int CambiarVariable(char* var, char* valor, char *e[], datos* data) { /*cambia una variable en el entorno que se le pasa como parámetro*/
     int pos;
     char *aux;
@@ -1367,14 +1491,11 @@ int cmdExecute(char* opcion[], int nTrozos, datos* data){
             printf("No ejecutado: %s\n", strerror(errno));
             return -1;
         }
-        printf("ejecutado");
-        int pid = fork();
-        waitpid(pid, NULL, 0);
-        return pid;
+        return 1;
     } else {
         printf("Imposible ejecutar: Bad address\n");
+        return -1;
     }
-    return -1;
 }
 
 char *NombreSenal(int sen)  /*devuelve el nombre senal a partir de la senal*/
@@ -1396,35 +1517,35 @@ char * NombreUsuario(uid_t user) /*devuelve el nombre de usuario a partir del us
         return (pw->pw_name);
 }
 
-int cmdListjobs(char* opcion[], int nTrozos, datos* data){
+int cmdListjobs(char* opcion[], int nTrozos, datos* data) {
     char time[MAXVAR];
     char out[MAXVAR];
-    tPosL p;
-    enum statusTypes status;
-    if (isEmptyList(data->processList)) {
-        return 0;
-    }
-    for(p=first(data->processList); !endOfList(p, data->processList); p=next(data->processList, p)) {
-        struct tItemL info = getItem(data->processList, p);
-        status = info.status;
-        if (waitpid(info.pid, &info.out, WNOHANG | WUNTRACED | WCONTINUED) == info.pid){
-            if(WIFEXITED(info.out)){
-                status = FINISHED; info.out = WEXITSTATUS(info.out);
-            }else if(WIFSIGNALED(info.out)){
-                status = SIGNALED; info.out = WTERMSIG(info.out);
-            }else if(WIFSTOPPED(info.out)){
-                status = STOPPED; info.out = WTERMSIG(info.out);
-            }else if(WIFCONTINUED(info.out))
-                status = ACTIVE;
+    for (tPosL p = first(data->processList); p != NULL; p = next(p, data->processList)) {
+        struct tItemL info = getItem(p, data->processList);
+        if (waitpid(info.pid, &info.out, WNOHANG | WUNTRACED | WCONTINUED) == info.pid) {
+            if (WIFCONTINUED(info.out))
+                strcpy(info.status, "ACTIVE");
+            else if (WIFEXITED(info.out)) {
+                strcpy(info.status, "FINISHED");
+                info.out = WEXITSTATUS(info.out);
+            } else if (WIFSIGNALED(info.out)) {
+                strcpy(info.status, "SIGNALED");
+                info.out = WTERMSIG(info.out);
+            } else if (WIFSTOPPED(info.out)) {
+                strcpy(info.status, "STOPPED");
+                info.out = WTERMSIG(info.out);
+            }
         }
-        strftime(time, MAXVAR, "%Y/%m/%d %H:%M:%S ",info.launchingDate);
-        if(status == FINISHED || status == ACTIVE){
-            printf("%d %10s p=%d %s %u (%03d) %s\n", info.pid, NombreUsuario(info.user), getpriority(PRIO_PROCESS,info.pid), time, status, info.out, info.command);
+        strftime(time, MAXVAR, "%Y/%m/%d %H:%M:%S ", info.launchingDate);
+        if (strcmp(info.status, "FINISHED") == 0 || strcmp(info.status, "ACTIVE") == 0) {
+            printf("%d %12s p=%d %s %s (%03d) %s\n", info.pid, NombreUsuario(info.user),
+                   getpriority(PRIO_PROCESS, info.pid), time, info.status, info.out, info.command);
+        } else if (strcmp(info.status, "SIGNALED") == 0 || strcmp(info.status, "STOPPED") == 0) {
+            strcpy(out, NombreSenal(info.out));
+            printf("%d %12s p=%d %s %s (%s) %s\n", info.pid, NombreUsuario(info.user),
+                   getpriority(PRIO_PROCESS, info.pid), time, info.status, out, info.command);
         }
-        else if(status == STOPPED || status == SIGNALED){
-            strcpy(out,NombreSenal(info.out));
-            printf("%d %10s p=%d %s %u (%3s) %s\n", info.pid, NombreUsuario(info.user), getpriority(PRIO_PROCESS,info.pid), time, status, out, info.command);
-        }
+        updateItem(info, p, &data->processList);
     }
     return 0;
 }
@@ -1434,26 +1555,21 @@ int cmdDeljobs(char* opcion[], int nTrozos, datos* data){
         bool term = false;
         bool sig = false;
         tPosL p;
-        for(int i=0;i<nTrozos;i++){
+        for(int i=0;i<nTrozos-1;i++){
             if(strcmp(opcion[i],"-term")==0) term=true;
             if(strcmp(opcion[i],"-sig")==0) sig=true;
         }
-        do{
-            for(p=first(data->processList); !endOfList(p, data->processList); p=next(data->processList, p)){
-                struct tItemL info= getItem(p, data->processList);
-                if(WIFEXITED(info.out) && term){
-                    deleteAtPosition(p, &data->processList);
-                    break;
-                }
-                else if(WIFSIGNALED(info.out) && sig){
-                    deleteAtPosition(p, &data->processList);
-                    break;
-                }
+        for(p=last(data->processList); p != NULL ; p=previous(p, data->processList)){
+            struct tItemL info= getItem(p, data->processList);
+            if(WIFEXITED(info.out) && term){
+                deleteAtPosition(p, &data->processList);
+                break;
+            } else if(WIFSIGNALED(info.out) && sig){
+                deleteAtPosition(p, &data->processList);
+                break;
             }
         }
-        while(!endOfList(p, data->processList));
-    }
-    else
+    } else
         cmdListjobs(opcion,nTrozos,data);
     return 0;
 }
@@ -1461,22 +1577,26 @@ int cmdDeljobs(char* opcion[], int nTrozos, datos* data){
 int cmdJob(char* opcion[], int nTrozos, datos* data){
     char time[MAXVAR];
     if(opcion[0] != NULL){
-        for(tPosL p=first(data->processList); !endOfList(p, data->processList); p=next(data->processList, p)){
+        for(tPosL p=first(data->processList); p != NULL; p=next(p, data->processList)){
             struct tItemL info = getItem(p, data->processList);
             if(strcmp(opcion[0],"-fg")==0){
                 if(info.pid==atoi(opcion[1])){
                     waitpid(info.pid,NULL,0);
-                    if(info.status == ACTIVE)
+                    if(strcmp(info.status, "ACTIVE")==0)
                         printf("Proceso %d terminado, valor devuelto %d\n" , info.pid, info.out);
-                    else
+                    else if(strcmp(info.status, "FINISHED")==0)
                         printf("Proceso %d pid finalizado\n", info.pid);
+                    else if(strcmp(info.status, "SIGNALED")==0)
+                        printf("Proceso %d terminado por la señal %s\n", info.pid, NombreSenal(info.out));
+                    else if(strcmp(info.status, "STOPPED")==0)
+                        printf("Proceso %d parado por la señal %s\n", info.pid, NombreSenal(info.out));
                     deleteAtPosition(p, &data->processList);
                     break;
                 }
             } else {
                 if(info.pid==atoi(opcion[0])){
                     strftime(time, MAXVAR, "%Y/%m/%d %H:%M:%S ",info.launchingDate);
-                    printf("%d %12s p=%d %s %u (%03d) %s\n", info.pid, NombreUsuario(info.user),
+                    printf("%d %12s p=%d %s %s (%03d) %s\n", info.pid, NombreUsuario(info.user),
                            getpriority(PRIO_PROCESS,info.pid), time, info.status, info.out, info.command);
                     break;
                 }

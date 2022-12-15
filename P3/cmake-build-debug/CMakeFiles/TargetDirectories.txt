@@ -1,3 +1,3 @@
-/home/manuamest/CLionProjects/PracticaSO/cmake-build-debug/CMakeFiles/PracticaSO.dir
-/home/manuamest/CLionProjects/PracticaSO/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/manuamest/CLionProjects/PracticaSO/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/manuamest/Documentos/UNI/SO/SOSHELL/P3/cmake-build-debug/CMakeFiles/PracticaSO.dir
+/home/manuamest/Documentos/UNI/SO/SOSHELL/P3/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/manuamest/Documentos/UNI/SO/SOSHELL/P3/cmake-build-debug/CMakeFiles/rebuild_cache.dir
