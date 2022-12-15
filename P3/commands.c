@@ -1391,12 +1391,8 @@ int CambiarVariable(char* var, char* valor, char *e[], datos* data) { /*cambia u
     strcat(aux, "=");
     strcat(aux, valor);
     e[pos] = aux;
-    /*if(entvar.var[0] == NULL)
-        entvar.var[entvar.lastPos] = aux;
-    else {*/
     data->entvar.lastPos++;
     data->entvar.var[data->entvar.lastPos] = aux;
-    //}
     return (pos);
 }
 
@@ -1442,7 +1438,6 @@ int cmdChangevar(char* opcion[], int nTrozos, datos* data){
             if(putenv(string) != 0)
                 printf("%s", strerror(errno));
         }
-        printf("%p\n", string);
         data->entvar.lastPos++;
         data->entvar.var[data->entvar.lastPos] = string;
     }

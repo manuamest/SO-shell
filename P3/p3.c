@@ -48,9 +48,7 @@ int main(int argc, char **argv, char **arg3) {
         //analizar
         execute(trozos, nTrozos, &data);
     }
-    printf("%d\n", data.entvar.lastPos);
     while(data.entvar.lastPos != -1){
-        printf("%p\n", data.entvar.var[data.entvar.lastPos]);
         free(data.entvar.var[data.entvar.lastPos]);
         data.entvar.lastPos--;
     }
